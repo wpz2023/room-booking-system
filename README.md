@@ -1,1 +1,1 @@
-# room-booking-system
+# Room booking system
