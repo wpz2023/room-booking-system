@@ -1,10 +1,10 @@
-package com.wpz.rbs.controllers.timetables;
+package com.wpz.rbs.controller.timetables;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.wpz.rbs.controllers.auth.models.LoggedInAuthModel;
+import com.wpz.rbs.controller.auth.models.LoggedInAuthModel;
 import com.wpz.rbs.configuration.ConfigurationHelpers;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;

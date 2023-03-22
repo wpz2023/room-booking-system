@@ -1,4 +1,4 @@
-package com.wpz.rbs.controllers.auth.models;
+package com.wpz.rbs.controller.auth.models;
 
 public record RequestTokenResultModel(String url, String temporaryToken, String temporaryTokenSecret) {
 

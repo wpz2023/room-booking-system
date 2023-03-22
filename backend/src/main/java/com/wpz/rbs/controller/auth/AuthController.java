@@ -1,23 +1,25 @@
-package com.wpz.rbs.controllers.auth;
+package com.wpz.rbs.controller.auth;
 
 import com.google.api.client.auth.oauth.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.wpz.rbs.controllers.auth.models.LoggedInAuthModel;
-import com.wpz.rbs.controllers.auth.models.RequestTokenResultModel;
-import com.wpz.rbs.controllers.auth.models.UsosAuthModel;
+import com.wpz.rbs.controller.auth.models.RequestTokenResultModel;
+import com.wpz.rbs.controller.auth.models.UsosAuthModel;
 import com.wpz.rbs.configuration.ConfigurationHelpers;
+import com.wpz.rbs.model.ApiUser;
+import com.wpz.rbs.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.UUID;
 
 // made along with https://stackoverflow.com/questions/15194182/examples-for-oauth1-using-google-api-java-oauth
 @RestController("auth")
 public class AuthController {
-    private final ConfigurationHelpers configurationHelpers;
-
-    public AuthController(ConfigurationHelpers configurationHelpers) {
-        this.configurationHelpers = configurationHelpers;
-    }
+    @Autowired
+    UserService userService;
+    @Autowired
+    ConfigurationHelpers configurationHelpers;
 
     // user needs to authenticate in USOS - he has to open returned url and send pin code via method authorize()
     @GetMapping("request_token")
@@ -43,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("access_token")
-    public LoggedInAuthModel accessTokenWithUsosPin(@RequestBody UsosAuthModel authModel) throws IOException {
+    public UUID accessTokenWithUsosPin(@RequestBody UsosAuthModel authModel) throws IOException {
         OAuthHmacSigner signer = new OAuthHmacSigner();
         signer.clientSharedSecret = configurationHelpers.getConsumerSecret();
         signer.tokenSharedSecret = authModel.temporaryTokenSecret();
@@ -57,6 +59,6 @@ public class AuthController {
         getAccessToken.consumerKey = configurationHelpers.getConsumerKey();
         OAuthCredentialsResponse accessTokenResponse = getAccessToken.execute();
 
-        return new LoggedInAuthModel(authModel.usosPin(), accessTokenResponse.token, accessTokenResponse.tokenSecret);
+        return userService.saveOrUpdate(new ApiUser(authModel.usosPin(), accessTokenResponse.token, accessTokenResponse.tokenSecret));
     }
 }
