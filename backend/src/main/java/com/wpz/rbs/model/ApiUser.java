@@ -1,6 +1,5 @@
 package com.wpz.rbs.model;
 
-import com.google.api.client.util.DateTime;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -20,11 +19,11 @@ public class ApiUser {
     public ApiUser() {
     }
 
-    public ApiUser(String usosPin, String token, String tokenSecret) {
+    public ApiUser(String usosPin, String token, String tokenSecret, Date expDate) {
         this.usosPin = usosPin;
         this.token = token;
         this.tokenSecret = tokenSecret;
-        this.dateTime = LocalDateTime.now();
+        this.expDate = expDate;
     }
 
     @Id
@@ -45,5 +44,5 @@ public class ApiUser {
 
     @Column
     @Nonnull
-    private LocalDateTime dateTime;
+    private Date expDate;
 }

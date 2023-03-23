@@ -7,14 +7,20 @@ import com.wpz.rbs.controller.auth.models.UsosAuthModel;
 import com.wpz.rbs.configuration.ConfigurationHelpers;
 import com.wpz.rbs.model.ApiUser;
 import com.wpz.rbs.service.UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Key;
+import java.util.Date;
 import java.util.UUID;
 
 // made along with https://stackoverflow.com/questions/15194182/examples-for-oauth1-using-google-api-java-oauth
-@RestController("auth")
+@RestController
+@RequestMapping("auth")
 public class AuthController {
     @Autowired
     UserService userService;
@@ -45,7 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("access_token")
-    public UUID accessTokenWithUsosPin(@RequestBody UsosAuthModel authModel) throws IOException {
+    public String accessTokenWithUsosPin(@RequestBody UsosAuthModel authModel) throws IOException {
         OAuthHmacSigner signer = new OAuthHmacSigner();
         signer.clientSharedSecret = configurationHelpers.getConsumerSecret();
         signer.tokenSharedSecret = authModel.temporaryTokenSecret();
@@ -59,6 +65,10 @@ public class AuthController {
         getAccessToken.consumerKey = configurationHelpers.getConsumerKey();
         OAuthCredentialsResponse accessTokenResponse = getAccessToken.execute();
 
-        return userService.saveOrUpdate(new ApiUser(authModel.usosPin(), accessTokenResponse.token, accessTokenResponse.tokenSecret));
+        Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(configurationHelpers.getJwtKey()));
+        // add a bit less than 2hrs to exp time
+        Date expDate = new Date(new Date().getTime() + 7000000L);
+        UUID userId = userService.saveOrUpdate(new ApiUser(authModel.usosPin(), accessTokenResponse.token, accessTokenResponse.tokenSecret, expDate));
+        return Jwts.builder().claim("userId", userId.toString()).setExpiration(expDate).signWith(key).compact();
     }
 }
