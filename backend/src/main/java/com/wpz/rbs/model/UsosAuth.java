@@ -3,32 +3,29 @@ package com.wpz.rbs.model;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Table
 @Data
-public class ApiUser {
-    public ApiUser() {
+public class UsosAuth {
+    public UsosAuth() {
     }
 
-    public ApiUser(String usosPin, String token, String tokenSecret, Date expDate) {
+    public UsosAuth(String usosPin, String token, String tokenSecret) {
         this.usosPin = usosPin;
         this.token = token;
         this.tokenSecret = tokenSecret;
-        this.expDate = expDate;
+        // add a bit less than 2hrs to exp time - USOS token lifetime is 2hrs
+        this.expDate = new Date(new Date().getTime() + 7000000L);
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private int id = 1;
 
     @Column
     @Nonnull
