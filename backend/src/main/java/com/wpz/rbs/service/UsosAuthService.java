@@ -1,6 +1,9 @@
 package com.wpz.rbs.service;
 
-import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.api.client.auth.oauth.*;
@@ -11,13 +14,16 @@ import com.wpz.rbs.model.UsosAuth;
 import com.wpz.rbs.repository.UsosAuthRepository;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
@@ -36,14 +42,23 @@ public class UsosAuthService {
     @Value("${security.usosApiPassword}")
     private String usosApiPassword;
 
-    @Autowired
-    private UsosAuthRepository usosAuthRepository;
+    private final UsosAuthRepository usosAuthRepository;
+
+    public UsosAuthService(UsosAuthRepository usosAuthRepository) {
+        this.usosAuthRepository = usosAuthRepository;
+    }
 
     public HttpResponse usosApiRequest(GenericUrl genericUrl) throws IOException {
-        Optional<UsosAuth> usosAuthOptional = usosAuthRepository.findById(1);
-        if (usosAuthOptional.isEmpty()) throw new IOException("Problem podczas autoryzacji w USOS API");
+        return usosApiRequestNoCheck(genericUrl, ensureUsosConnection());
+    }
 
-        UsosAuth usosAuth = usosAuthOptional.get();
+    // annotation invokes this method after server start - always after restart of app USOS API indicates token is expired
+    @EventListener(ApplicationReadyEvent.class)
+    public synchronized void loginAfterStart() throws IOException {
+        ensureUsosConnection();
+    }
+
+    private HttpResponse usosApiRequestNoCheck(GenericUrl genericUrl, UsosAuth usosAuth) throws IOException {
         OAuthHmacSigner signer = new OAuthHmacSigner();
         signer.clientSharedSecret = consumerSecret;
 
@@ -57,23 +72,28 @@ public class UsosAuthService {
         return new NetHttpTransport().createRequestFactory(oauthParameters).buildGetRequest(genericUrl).execute();
     }
 
-    public void checkRefreshUsosConnection() throws IOException {
+    private UsosAuth ensureUsosConnection() throws IOException {
         try {
             Optional<UsosAuth> usosAuth = usosAuthRepository.findById(1);
             if (usosAuth.isEmpty() && !logInToUsosApi()) throw new Exception();
             else {
-                // re-download from db in case of empty/old usosAuth
                 usosAuth = usosAuthRepository.findById(1);
                 if (usosAuth.isEmpty()) throw new Exception();
-                if (usosAuth.get().getExpDate().compareTo(new Date()) <= 0) logInToUsosApi();// TODO: refresh
+                if (usosAuth.get().getExpDate().compareTo(new Date()) <= 0) {
+                    if (!renewValidUsosLogin() && !logInToUsosApi()) throw new Exception();
+                }
             }
+
+            usosAuth = usosAuthRepository.findById(1);
+            if (usosAuth.isEmpty()) throw new Exception();
+            return usosAuth.get();
         } catch (Exception ignored) {
             throw new IOException("Problem podczas autoryzacji w USOS API");
         }
     }
 
     // made along with https://stackoverflow.com/questions/15194182/examples-for-oauth1-using-google-api-java-oauth
-    private boolean logInToUsosApi() throws IOException {
+    private synchronized boolean logInToUsosApi() {
         try {
             OAuthHmacSigner signer = new OAuthHmacSigner();
             signer.clientSharedSecret = consumerSecret;
@@ -124,7 +144,9 @@ public class UsosAuthService {
             }
 
             if (checkUsosPinNotGiven(responseUrl)) return false;
-            String usosPinString = getPinOptional(responseUrl).get().getValue();
+            Optional<NameValuePair> usosPinStringOptional = getPinOptional(responseUrl);
+            if (usosPinStringOptional.isEmpty()) return false;
+            String usosPinString = usosPinStringOptional.get().getValue();
 
             // Get Access Token using Temporary token and Verifier Code
             OAuthGetAccessToken getAccessToken = new OAuthGetAccessToken("https://apps.usos.uj.edu.pl/services/oauth/access_token");
@@ -138,6 +160,22 @@ public class UsosAuthService {
             usosAuthRepository.save(new UsosAuth(usosPinString, accessTokenResponse.token, accessTokenResponse.tokenSecret));
             return true;
         } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private synchronized boolean renewValidUsosLogin() {
+        GenericUrl revokeTokenUrl = new GenericUrl("https://apps.usos.uj.edu.pl/services/oauth/revoke_token");
+        try {
+            Optional<UsosAuth> usosAuth = usosAuthRepository.findById(1);
+            if (usosAuth.isEmpty()) return false;
+            JSONObject response = new JSONObject(usosApiRequestNoCheck((revokeTokenUrl), usosAuth.get()).parseAsString());
+            return Objects.equals(response.get("success").toString(), "true");
+        } catch (Exception e) {
+            try {
+                wait(11000);
+            } catch (Exception ignored) {
+            }
             return false;
         }
     }

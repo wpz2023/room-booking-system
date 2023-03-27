@@ -1,20 +1,28 @@
 package com.wpz.rbs.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wpz.rbs.model.Room;
+import com.wpz.rbs.model.usos.RoomsUsos;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class RoomImportService {
-    @Autowired
-    UsosAuthService usosAuthService;
+    private final UsosAuthService usosAuthService;
 
-    public void getAll() throws IOException {
+    public RoomImportService(UsosAuthService usosAuthService) {
+        this.usosAuthService = usosAuthService;
+    }
+
+    public List<Room> getAll() throws IOException {
         GenericUrl genericUrl = new GenericUrl("https://apps.usos.uj.edu.pl/services/geo/building2");
+        genericUrl.set("building_id", "Loj11");
         genericUrl.set("langpref", "pl");
-        usosAuthService.usosApiRequest(genericUrl);
-        int a =0;
+        genericUrl.set("fields", "rooms");
+        RoomsUsos roomsUsos = new ObjectMapper().readValue(usosAuthService.usosApiRequest(genericUrl).parseAsString(), RoomsUsos.class);
+        return roomsUsos.rooms.stream().map(room -> new Room(room.id, room.number)).toList();
     }
 }
