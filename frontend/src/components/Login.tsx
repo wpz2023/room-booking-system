@@ -3,7 +3,7 @@ import React from 'react'
 function Login() {
   return (
     <div className="flex justify-center">
-        <div className='p-6 w-1/2' >
+        <div className='p-6 w-2/5' >
           <form className="flex flex-col w-full ">
             <label className="flex flex-col ph-20">
               <span className="flex py-2 after:content-['*'] after:text-red-600">Email</span>
