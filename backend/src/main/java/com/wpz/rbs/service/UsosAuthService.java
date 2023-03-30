@@ -129,13 +129,14 @@ public class UsosAuthService {
                 responseUrl = resultPage.getUrl();
                 if (checkUsosPinNotGiven(responseUrl)) try {
                     // sometimes api asks if it is really you
+                    webClient.waitForBackgroundJavaScript(10000);
                     resultPage = resultPage.getHtmlElementById("local-continue").click();
                     responseUrl = resultPage.getUrl();
                 } catch (ElementNotFoundException ignored) {
                 }
-
                 if (checkUsosPinNotGiven(responseUrl)) {
                     // giving permission to our app - asks only for first time
+                    webClient.waitForBackgroundJavaScript(10000);
                     resultPage = resultPage.getHtmlElementById("local-allow").click();
                     responseUrl = resultPage.getUrl();
                 }
