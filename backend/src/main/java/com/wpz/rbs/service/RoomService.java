@@ -25,20 +25,17 @@ public class RoomService {
         return roomRepository.findById(id).get();  
     }  
 
-    // When updating, keeps the "adnotation" member, unless it's empty ("")
-    public void saveOrUpdate(Room example){  
-        var optional = roomRepository.findById(example.getId());
+    // When updating, keeps the "annotation" member, unless it's empty ("")
+    public void saveOrUpdate(Room room){  
+        var optional = roomRepository.findById(room.getId());
         if(optional.isPresent()){
-            var existingAdnotation = optional.get().getAdnotation();
+            var existingAnnotation = optional.get().getAnnotation();
 
-            if(existingAdnotation.equals("")){
-                example.setAdnotation(existingAdnotation);
+            if(existingAnnotation.equals("") == false){
+                room.setAnnotation(existingAnnotation);
             }
         }
-        roomRepository.save(example);  
+        roomRepository.save(room);  
     }  
 
-    public void delete(int id){  
-        roomRepository.deleteById(id);  
-    }  
 }

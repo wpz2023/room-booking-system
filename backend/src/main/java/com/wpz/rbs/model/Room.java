@@ -21,5 +21,5 @@ public class Room {
     @Column
     private int capacity;
     @Column
-    private String adnotation = "";
+    private String annotation = "";
 }
