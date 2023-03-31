@@ -44,32 +44,23 @@ function Login() {
                 <form className=" " onSubmit={handleSubmit} method={"POST"}>
                     <label className="flex flex-col py-2">
                         <span className="flex py-2 after:content-['*'] after:text-red-600 font-bold">Email</span>
-                        {!isEmailValid ?
-                            <input type="email" name="email" placeholder={"adres@email"} value={email} onChange={handeEmailChange}
-                                   className=" py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400
-                                   border-red-600 ring-red-600 block w-full rounded-md sm:text-sm focus:ring-1"/> :
-                            <input type="email" name="email" placeholder={"adres@email"} value={email} onChange={handeEmailChange}
-                                   className=" py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none
-                                   focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"/>}
-                        {!isEmailValid ? <p className="py-2 text-red-600">Nieprawidłowy adres email</p> : <p></p>}
+                        <input type="email" name="email" placeholder={"adres@email"} value={email} onChange={handeEmailChange}
+                               className={"py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none block w-full rounded-md sm:text-sm" + (!isEmailValid ? "border-red-600 ring-red-600 ring-2" : "focus:border-sky-500 focus:ring-sky-500 focus:ring-2" )} />
+
+                        {!isEmailValid && <p className="py-2 text-red-600">Nieprawidłowy adres email</p>}
                     </label>
                     <label className="flex flex-col py-2">
                         <span className="flex py-2 after:content-['*'] after:text-red-600 font-bold">Hasło</span>
-                        {!isPasswordValid ?
-                            <input type="password" name="password" value={password} onChange={handePasswordChange}
-                                   className="py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400
-                                   border-red-600 ring-red-600 block w-full rounded-md sm:text-sm focus:ring-1"/> :
-                            <input type="password" name="password" value={password} onChange={handePasswordChange}
-                                    className="py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none
-                                    focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"/>
-                        }
-                        {!isPasswordValid ? <p className="py-2 text-red-600">Nieprawidłowe hasło</p> : <p></p>}
+                        <input type="password" name="password" value={password} onChange={handePasswordChange}
+                               className={"py-3 px-5 border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none block w-full rounded-md sm:text-sm" + (!isPasswordValid ? "border-red-600 ring-red-600 ring-2" : "focus:border-sky-500 focus:ring-sky-500 focus:ring-2" )} />
+
+                        {!isPasswordValid && <p className="py-2 text-red-600">Nieprawidłowe hasło</p>}
                     </label>
                     <div className="flex flex-col justify-center items-center">
-                        <input type="submit" value="Zaloguj"
+                        <button type="submit"
                                className="mt-12 mb-3 px-12 py-2  transition hover:scale-110 delay-150 rounded-lg bg-sky-500
-                               hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"></input>
-                        {isPasswordValid && isEmailValid && submitted ? <p className="py-2 text-green-500">Dane poprawne</p> : <p></p>}
+                               hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">Zaloguj</button>
+                        {isPasswordValid && isEmailValid && submitted && <p className="py-2 text-green-500">Dane poprawne</p>}
                     </div>
                 </form>
             </div>
