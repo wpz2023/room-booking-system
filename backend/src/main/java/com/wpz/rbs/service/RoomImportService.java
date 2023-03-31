@@ -23,8 +23,13 @@ public class RoomImportService {
         genericUrl.set("building_id", "Loj11");
         genericUrl.set("langpref", "pl");
         genericUrl.set("fields", "rooms[id|number|type]");
-        String json = usosAuthService.usosApiRequest(genericUrl).parseAsString();
-        RoomsUsos roomsUsos = new ObjectMapper().readValue(json, RoomsUsos.class);
-        return roomsUsos.rooms.stream().filter(room -> Objects.equals(room.type, "didactics_room")).map(room -> new Room(room.id, room.number)).toList();
+
+        String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
+        RoomsUsos roomsUsos = new ObjectMapper().readValue(jsonResponse, RoomsUsos.class);
+
+        return roomsUsos.rooms.stream()
+                .filter(room -> Objects.equals(room.type, "didactics_room"))
+                .map(room -> new Room(room.id, room.number))
+                .toList();
     }
 }
