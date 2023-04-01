@@ -18,9 +18,6 @@ public class ActivityUsos {
     @JsonProperty("end_time")
     public String end_time;
 
-    @JsonProperty("name")
-    public Map<String,String> name;
-
     @JsonProperty("url")
     public String url;
 
@@ -32,4 +29,12 @@ public class ActivityUsos {
 
     @JsonProperty("lecturer_ids")
     public List<Integer> lecturer_ids;
+
+    @JsonProperty
+    public int group_number;
+
+    @JsonProperty
+    public int room_id;
+
+
 }

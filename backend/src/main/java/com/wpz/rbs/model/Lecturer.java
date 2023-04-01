@@ -1,15 +1,8 @@
 package com.wpz.rbs.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +22,7 @@ public class Lecturer {
     @Column
     private String last_name;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "lecturers")
-    private Set<Activity> activities = new HashSet<>();
+    //@JsonIgnore
+    //@ManyToMany(fetch = FetchType.LAZY, mappedBy = "lecturers")
+    //private Set<Activity> activities = new HashSet<>();
 }
