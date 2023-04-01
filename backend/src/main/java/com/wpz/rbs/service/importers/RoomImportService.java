@@ -32,7 +32,7 @@ public class RoomImportService {
         genericUrl.set("fields", "rooms[id|number|type|capacity]");
 
         String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
-        System.out.println(jsonResponse);
+
         RoomsUsos roomsUsos = mapper.readValue(jsonResponse, RoomsUsos.class);
         var filtered = roomsUsos.rooms.stream().filter(room -> Objects.equals(room.getType(), "didactics_room")).toList();
 
