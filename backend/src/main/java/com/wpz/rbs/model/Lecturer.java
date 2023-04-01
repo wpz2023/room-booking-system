@@ -21,8 +21,4 @@ public class Lecturer {
 
     @Column
     private String last_name;
-
-    //@JsonIgnore
-    //@ManyToMany(fetch = FetchType.LAZY, mappedBy = "lecturers")
-    //private Set<Activity> activities = new HashSet<>();
 }
