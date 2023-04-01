@@ -1,9 +1,12 @@
-package com.wpz.rbs.service;
+package com.wpz.rbs.service.importers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.usos.RoomsUsos;
+import com.wpz.rbs.service.RoomService;
+import com.wpz.rbs.service.UsosAuthService;
+
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

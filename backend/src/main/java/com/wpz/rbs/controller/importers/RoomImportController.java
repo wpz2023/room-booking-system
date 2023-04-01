@@ -1,7 +1,7 @@
-package com.wpz.rbs.controller.roomimport;
+package com.wpz.rbs.controller.importers;
 
 import com.wpz.rbs.model.Room;
-import com.wpz.rbs.service.RoomImportService;
+import com.wpz.rbs.service.importers.RoomImportService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("roomsImport")
+@RequestMapping("import/room")
 public class RoomImportController {
     private final RoomImportService roomImportService;
 
