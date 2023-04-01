@@ -25,6 +25,12 @@ public class ActivityService {
         return activityRepository.findById(id).get();  
     }  
 
+    public List<Activity> getByRoomId(int roomId){  
+        List<Activity> activities = new ArrayList<Activity>();  
+        activityRepository.findAllByRoom_Id(roomId).forEach(activity -> activities.add(activity));  
+        return activities;  
+    }  
+
     public Activity saveOrUpdate(Activity activity){  
         return activityRepository.save(activity);
     }  
