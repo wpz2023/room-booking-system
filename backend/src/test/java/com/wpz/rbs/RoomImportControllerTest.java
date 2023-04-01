@@ -1,7 +1,7 @@
 package com.wpz.rbs;
 
-import com.wpz.rbs.controller.roomimport.RoomImportController;
-import com.wpz.rbs.service.RoomImportService;
+import com.wpz.rbs.controller.importers.RoomImportController;
+import com.wpz.rbs.service.importers.RoomImportService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

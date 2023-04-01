@@ -1,9 +1,12 @@
-package com.wpz.rbs.service;
+package com.wpz.rbs.service.importers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.usos.RoomsUsos;
+import com.wpz.rbs.service.RoomService;
+import com.wpz.rbs.service.UsosAuthService;
+
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,7 +32,7 @@ public class RoomImportService {
         genericUrl.set("fields", "rooms[id|number|type|capacity]");
 
         String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
-
+        System.out.println(jsonResponse);
         RoomsUsos roomsUsos = mapper.readValue(jsonResponse, RoomsUsos.class);
         var filtered = roomsUsos.rooms.stream().filter(room -> Objects.equals(room.getType(), "didactics_room")).toList();
 
