@@ -23,11 +23,6 @@ public class ActivityController {
         return activityService.getAll();
     }
 
-    @GetMapping("{id}")
-    private Activity get(@PathVariable("id") int id){
-        return activityService.getById(id);
-    }
-
     @GetMapping("room/{id}")
     private List<Activity> getByRoomId(@PathVariable("id") int roomId){
         return activityService.getByRoomId(roomId);

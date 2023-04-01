@@ -20,10 +20,6 @@ public class ActivityService {
         activityRepository.findAll().forEach(activity -> activities.add(activity));  
         return activities;  
     }  
- 
-    public Activity getById(int id){  
-        return activityRepository.findById(id).get();  
-    }  
 
     public List<Activity> getByRoomId(int roomId){  
         List<Activity> activities = new ArrayList<Activity>();  
