@@ -16,7 +16,7 @@ function App() {
             <Route path=":id" element={<Room />} />
           </Route>
           <Route path="rezerwacja" element={<Reservation />} />
-          <Route path="import" element={<ImportData />} />
+          <Route index path="import" element={<ImportData />} />
           <Route path="login" element={<Login />} />
           <Route path="*" element={<div>Nie znaleziono strony </div>} />
         </Route>
