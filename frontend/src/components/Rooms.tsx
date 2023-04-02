@@ -11,21 +11,26 @@ function Rooms() {
 
   roomsQuery.data?.forEach((room) => (room.type = "Sala dydatkyczna"));
   return (
-    <div className="p-6">
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-5">Lista sal</h1>
       {roomsQuery.isFetching ? (
         <div className="">Loading...</div>
       ) : (
-        <ul className="">
+        <div className="grid grid-cols-3 gap-8">
           {roomsQuery.data?.map((room) => (
-            <li className="" key={room.id}>
-              <div className="flex justify-evenly">
-                <Link to={room.id.toString()}>{room.number}</Link>
-                <div className="">{room.type}</div>
-                <div className="">{room.capacity}</div>
+            <Link to={room.id.toString()}>
+              <div className="bg-gray-200 rounded-lg shadow-lg p-6">
+                <h2 className="text-lg font-bold mb-4">{room.number}</h2>
+                <p className="text-sm mb-2">
+                  <span className="font-bold">Rodzaj:</span> {room.type}
+                </p>
+                <p className="text-sm mb-2">
+                  <span className="font-bold">Pojemność:</span> {room.capacity}
+                </p>
               </div>
-            </li>
+            </Link>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
