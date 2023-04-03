@@ -9,7 +9,7 @@ function Rooms() {
     queryFn: () => Api.get("room").then((res) => res.data),
   });
 
-  roomsQuery.data?.forEach((room) => (room.type = "Sala dydatkyczna"));
+  roomsQuery.data?.forEach((room) => (room.type = "Sala dydaktyczna"));
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-5">Lista sal</h1>
