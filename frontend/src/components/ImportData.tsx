@@ -6,17 +6,15 @@ import Api from "../Api";
 
 function ImportData() {
 
-  const emulateFetch = () => {
+  const fetchRoomsData = () => {
     return Api.get("import/room").then((res) => res.data);
   }
 
   const handleClick = () => {
       refetch();
-      data?.forEach((room) => (room.type = "Sala dydatkyczna"));
-
   };
 
-  const { isFetching, data, refetch} = useQuery<RoomData[]>( ["data"], emulateFetch, {
+  const { isFetching, data, refetch} = useQuery<RoomData[]>( ["data"], fetchRoomsData, {
     refetchOnWindowFocus: false,
     enabled: false
   });
