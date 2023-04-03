@@ -12,24 +12,28 @@ import com.wpz.rbs.repository.LecturerRepository;
 
 @Service
 public class LecturerService {
-    
-    @Autowired
-    LecturerRepository lecturerRepository;
 
-    public List<Lecturer> getAll(){  
-        List<Lecturer> lecturers = new ArrayList<Lecturer>();  
-        lecturerRepository.findAll().forEach(lecturer -> lecturers.add(lecturer));  
-        return lecturers;  
-    }  
- 
-    public Lecturer getById(int id){  
-        return lecturerRepository.findById(id).get();  
-    }  
-    public Optional<Lecturer> getByIdOptional(int id){  
-        return lecturerRepository.findById(id); 
-    }  
+    private final LecturerRepository lecturerRepository;
 
-    public Lecturer saveOrUpdate(Lecturer lecturer){  
+    public LecturerService(LecturerRepository lecturerRepository) {
+        this.lecturerRepository = lecturerRepository;
+    }
+
+    public List<Lecturer> getAll() {
+        List<Lecturer> lecturers = new ArrayList<>();
+        lecturerRepository.findAll().forEach(lecturers::add);
+        return lecturers;
+    }
+
+    public Lecturer getById(int id) {
+        return lecturerRepository.findById(id).get();
+    }
+
+    public Optional<Lecturer> getByIdOptional(int id) {
+        return lecturerRepository.findById(id);
+    }
+
+    public Lecturer saveOrUpdate(Lecturer lecturer) {
         return lecturerRepository.save(lecturer);
-    }  
+    }
 }

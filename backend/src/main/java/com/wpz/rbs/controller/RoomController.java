@@ -1,36 +1,33 @@
 package com.wpz.rbs.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.service.RoomService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class RoomController {
-    
-    @Autowired
-    RoomService roomService;
+
+    private final RoomService roomService;
+
+    public RoomController(RoomService roomService) {
+        this.roomService = roomService;
+    }
 
     @GetMapping("/room")
-    private List<Room> getAll(){
+    private List<Room> getAll() {
         return roomService.getAll();
     }
 
     @GetMapping("/room/{id}")
-    private Room get(@PathVariable("id") int id){
+    private Room get(@PathVariable("id") int id) {
         return roomService.getById(id);
     }
 
-    @PutMapping("/room")  
-    private int save(@RequestBody Room room){  
-        roomService.saveOrUpdate(room);  
-        return room.getId();  
-    }  
+    @PutMapping("/room")
+    private int save(@RequestBody Room room) {
+        roomService.saveOrUpdate(room);
+        return room.getId();
+    }
 }
