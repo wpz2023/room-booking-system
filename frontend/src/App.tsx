@@ -4,13 +4,17 @@ import Rooms from "./components/Rooms";
 import Reservation from "./components/Reservation";
 import ImportData from "./components/ImportData";
 import Login from "./components/Login";
+import Room from "./components/Room";
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Navbar />}>
-          <Route path="sale" element={<Rooms />} />
+          <Route path="sale">
+            <Route index element={<Rooms />} />
+            <Route path=":id" element={<Room />} />
+          </Route>
           <Route path="rezerwacja" element={<Reservation />} />
           <Route path="import" element={<ImportData />} />
           <Route path="login" element={<Login />} />
