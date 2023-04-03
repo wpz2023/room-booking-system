@@ -1,12 +1,9 @@
 package com.wpz.rbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
 @Entity
 @Table
 @Data
@@ -21,5 +18,6 @@ public class Room {
     @Column
     private int capacity;
     @Column
-    private String annotation = "";
+    @Enumerated(EnumType.STRING)
+    private RoomAnnotation roomAnnotation = RoomAnnotation.EMPTY;
 }

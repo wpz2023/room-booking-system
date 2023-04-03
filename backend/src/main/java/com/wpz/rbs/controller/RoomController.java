@@ -2,9 +2,12 @@ package com.wpz.rbs.controller;
 
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.service.RoomService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class RoomController {
@@ -25,9 +28,14 @@ public class RoomController {
         return roomService.getById(id);
     }
 
-    @PutMapping("/room")
-    private int save(@RequestBody Room room) {
-        roomService.saveOrUpdate(room);
-        return room.getId();
+    @PatchMapping("/room/update/{id}")
+    private ResponseEntity<Room> updateType(@PathVariable("id") int id, @RequestBody Map<String, String> updates) {
+        if (!updates.isEmpty() && updates.containsKey("roomAnnotation")) {
+            Room room = roomService.updateRoomAnnotation(id, updates.get("roomAnnotation"));
+            if (room != null) {
+                return ResponseEntity.ok(room);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
