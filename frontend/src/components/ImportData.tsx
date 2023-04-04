@@ -6,7 +6,7 @@ import Api from "../Api";
 
 function ImportData() {
 
-  const fetchRoomsData = () => {
+  const getImportRooms = () => {
     return Api.get("import/room").then((res) => res.data);
   }
 
@@ -14,7 +14,7 @@ function ImportData() {
       refetch();
   };
 
-  const { isFetching, data, refetch} = useQuery<RoomData[]>( ["data"], fetchRoomsData, {
+  const { isFetching, data, refetch} = useQuery<RoomData[]>( ["data"], getImportRooms, {
     refetchOnWindowFocus: false,
     enabled: false
   });
@@ -26,7 +26,7 @@ function ImportData() {
         </div>
         <button className="mb-14 px-12 py-2  transition hover:scale-110 delay-150 rounded-lg
         bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500" onClick={handleClick}>
-          Zaimportuj dane
+          Importuj dane
         </button>
         {isFetching ? <p>Ładowanie danych</p> : (
             <div>
@@ -39,8 +39,8 @@ function ImportData() {
                         <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                             <div className="flex text-center items-center">
                                 <p className="basis-3/5 font-medium">{room.number}</p>
-                                <button className="basis-2/5  px-12 py-2  transition hover:scale-110 delay-150 rounded-lg
-        bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">Importuj</button>
+                                <button className="basis-2/5  px-8 py-2  transition hover:scale-110 delay-150 rounded-lg
+        bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">Importuj plan</button>
                             </div>
                         </li>
                     ))}
