@@ -1,6 +1,7 @@
 package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Room;
+import com.wpz.rbs.model.RoomAnnotation;
 import com.wpz.rbs.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class RoomService {
     }
 
     public List<Room> getAll() {
-        List<Room> rooms = new ArrayList<Room>();
+        List<Room> rooms = new ArrayList<>();
         roomRepository.findAll().forEach(rooms::add);
         return rooms;
     }
@@ -26,17 +27,23 @@ public class RoomService {
         return roomRepository.findById(id).get();
     }
 
-    // When updating, keeps the "annotation" member, unless it's empty ("")
     public void saveOrUpdate(Room room) {
         var optional = roomRepository.findById(room.getId());
         if (optional.isPresent()) {
-            var existingAnnotation = optional.get().getAnnotation();
-
-            if (!existingAnnotation.equals("")) {
-                room.setAnnotation(existingAnnotation);
-            }
+            var existingRoomType = optional.get().getRoomAnnotation();
+            room.setRoomAnnotation(existingRoomType);
         }
         roomRepository.save(room);
     }
 
+    public Room updateRoomAnnotation(int roomId, String roomAnnotation) {
+        var optional = roomRepository.findById(roomId);
+        if (optional.isPresent() && RoomAnnotation.checkIfCorrectAnnotation(roomAnnotation)) {
+            Room room = optional.get();
+            room.setRoomAnnotation(RoomAnnotation.getByAnnotation(roomAnnotation));
+            roomRepository.save(room);
+            return room;
+        }
+        return null;
+    }
 }
