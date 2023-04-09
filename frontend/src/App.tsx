@@ -5,6 +5,7 @@ import Reservation from "./components/Reservation";
 import ImportData from "./components/ImportData";
 import Login from "./components/Login";
 import Room from "./components/Room";
+import AuthRoute from "./AuthRoute";
 
 function App() {
   return (
@@ -16,7 +17,15 @@ function App() {
             <Route path=":id" element={<Room />} />
           </Route>
           <Route path="rezerwacja" element={<Reservation />} />
-          <Route index path="import" element={<ImportData />} />
+          <Route 
+          path="import"
+            element={
+              <AuthRoute>
+                <ImportData />
+              </AuthRoute>
+            }
+          >
+          </Route>
           <Route path="login" element={<Login />} />
           <Route path="*" element={<div>Nie znaleziono strony </div>} />
         </Route>
