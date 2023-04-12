@@ -18,7 +18,7 @@ function Room() {
   });
 
   const getRoomActivities = () => {
-    return Api.get(`activity/room/${id}`).then((res) => res.data);
+    return Api.get(`import/activity/${id}`).then((res) => res.data);
   }
 
   const {data: activities, isFetching: isRoomActivitiesFetching, refetch: refetchActivities } = useQuery<Activity[]>(["activities"], getRoomActivities, {
@@ -31,38 +31,55 @@ function Room() {
     refetchActivities();
   }, []);
 
-  // const activities = useQuery<Activity[]>({
-  //   queryKey: ["activities"],
-  //   queryFn: () => Api.get(`activity/room/${id}`).then((res) => res.data),
-  // });
-
-  console.log(activities);
 
   return (
-      <div>
-        <div className="container mx-auto py-10">
+      <div className="container mx-auto py-10">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-3xl font-bold mb-3">Sala</h1>
           {isRoomFetching ? (
-              <div className="">Ładowanie danych...</div>
+              <p className="text-center">Ładowanie danych...</p>
           ) : (
-              <div>
-                <h1 className="p-6">Room {id}</h1>
-                <h1 className="p-6">ID: {room?.number}</h1>
-                <h1 className="p-6">Typ: {room?.type=="didactics_room" ? "Sala dydaktyczna" : room?.type}</h1>
-                <h1 className="p-6">Pojemność: {room?.capacity}</h1>
-                <br/>
+              <div className="w-52 text-start">
+                <p className="pb-8 text-4xl text-center font-bold">{room?.number}</p>
+
+                <p className="mb-2 text-lg">
+                  <span className="font-bold">Rodzaj: </span>
+                  {room?.type=="didactics_room" ? "Sala dydaktyczna" : room?.type}
+                </p>
+
+                <p className="mb-2 text-lg">
+                  <span className="font-bold">Pojemność: </span>
+                  {room?.capacity}
+                </p>
               </div>
           )}
         </div>
         <div>
-          <p>tutaj sie zaczyna zabawa</p>
           {isRoomActivitiesFetching? (
               <div className="">Ładowanie danych...</div>
           ) : (
               <div>
+                <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
+
                 {activities?.map((activity) => (
                     <li className="first:pt-0 last:pb-0 py-8" key={activity.id}>
                       <div className="flex text-center items-center">
-                        <p className="basis-3/5 font-medium">cos {activity.id}</p>
+                        <p className="basis-3/5 font-medium">type: {activity.type}</p>
+                        <p className="basis-3/5 font-medium">start: {activity.start_time}</p>
+                        <p className="basis-3/5 font-medium">end: {activity.end_time}</p>
+                        <p className="basis-3/5 font-medium">course: {activity.course_name["pl"]}</p>
+                        <p className="basis-3/5 font-medium">classtype: {activity.classtype_name["pl"]}</p>
+
+                        { Array.from(activity.lecturers).map((lecturer) => (
+                            <li>
+                              <p>{lecturer.first_name}</p>
+                              <p>{lecturer.last_name}</p>
+                            </li>
+                        ))}
+
+                        {/*<p className="basis-3/5 font-medium">lecturer: {activity.lecturers.}</p>*/}
+                        <p className="basis-3/5 font-medium">group nr: {activity.group_number}</p>
+                        <p className="basis-3/5 font-medium">room id: {activity.room_id}</p>
                       </div>
                     </li>
                 ))}
