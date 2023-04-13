@@ -26,7 +26,7 @@ public class ReservationService {
     }
 
     public Reservation getById(int id) {
-        return reservationRepository.findById(id).get();
+        return reservationRepository.findById(id).orElse(null);
     }
 
     public List<Reservation> getByRoomId(int roomId) {
@@ -43,23 +43,21 @@ public class ReservationService {
         if (!roomRepository.existsById(reservation.getRoom_id()))
             return ResponseEntity.status(400).body("Wrong room id");
         if (startDate.compareTo(endDate) >= 0)
-            return ResponseEntity.status(409).body("Start date is later than end date");
+            return ResponseEntity.status(400).body("Start date is later than end date");
         if (collisionExists(reservation.getRoom_id(), startDate, endDate))
-            throw new RuntimeException("Room reservation collision detected");
+            return ResponseEntity.status(409).body("Room reservation collision detected");
         return ResponseEntity.ok(reservationRepository.save(new Reservation(reservation)).getId());
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
-        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> compareDates(newStartDate, newEndDate, a.getStart_time(), a.getEnd_time()));
-    }
-
-    private boolean compareDates(Date newStartDate, Date newEndDate, String startDateString, String endDateString) {
-        try {
-            Date startDate = StaticHelpers.parseDateTime(startDateString);
-            Date endDate = StaticHelpers.parseDateTime(endDateString);
-            return ((newStartDate.compareTo(startDate) >= 0 && newStartDate.compareTo(endDate) <= 0) || (newEndDate.compareTo(startDate) >= 0 && newEndDate.compareTo(endDate) <= 0) || (newStartDate.compareTo(startDate) <= 0 && newEndDate.compareTo(endDate) >= 0));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> {
+            try {
+                Date startDate = StaticHelpers.parseDateTime(a.getStart_time());
+                Date endDate = StaticHelpers.parseDateTime(a.getEnd_time());
+                return StaticHelpers.activitiesNotOverlapping(newStartDate, newEndDate, startDate, endDate);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

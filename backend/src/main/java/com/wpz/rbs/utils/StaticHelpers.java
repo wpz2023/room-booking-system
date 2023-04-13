@@ -23,4 +23,8 @@ public class StaticHelpers {
         c.add(Calendar.DATE, days);
         return c.getTime();
     }
+
+    public static boolean activitiesNotOverlapping(Date startDate1, Date endDate1, Date startDate2, Date endDate2) {
+        return !((startDate1.compareTo(startDate2) >= 0 && startDate1.compareTo(endDate2) <= 0) || (endDate1.compareTo(startDate2) >= 0 && endDate1.compareTo(endDate2) <= 0) || (startDate1.compareTo(startDate2) <= 0 && endDate1.compareTo(endDate2) >= 0));
+    }
 }
