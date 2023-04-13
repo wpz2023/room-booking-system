@@ -1,6 +1,7 @@
 package com.wpz.rbs.model.reservation;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class CreateReservation {
     private String start_time;
     @NotEmpty
     private String end_time;
+    @NotNull
     private int room_id;
 }

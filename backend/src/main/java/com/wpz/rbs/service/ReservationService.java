@@ -5,11 +5,11 @@ import com.wpz.rbs.model.reservation.CreateReservation;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.repository.ReservationRepository;
 import com.wpz.rbs.repository.RoomRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,21 +32,27 @@ public class ReservationService {
     }
 
     public List<Reservation> getByRoomId(int roomId) {
-        return new ArrayList<>(reservationRepository.findAllByRoom_Id(roomId));
+        return reservationRepository.findAllByRoom_Id(roomId);
     }
 
-    public int createReservation(CreateReservation reservation) throws ParseException {
+    public List<Reservation> getAll() {
+        return reservationRepository.findAll();
+    }
+
+    public ResponseEntity<?> createReservation(CreateReservation reservation) throws ParseException {
         Date startDate = dateFormat.parse(reservation.getStart_time());
         Date endDate = dateFormat.parse(reservation.getEnd_time());
-        if (!roomRepository.existsById(reservation.getRoom_id())) throw new RuntimeException("Wrong room id");
-        if (startDate.compareTo(endDate) >= 0) throw new RuntimeException("Start date is later than end date");
+        if (!roomRepository.existsById(reservation.getRoom_id()))
+            return ResponseEntity.status(400).body("Wrong room id");
+        if (startDate.compareTo(endDate) >= 0)
+            return ResponseEntity.status(409).body("Start date is later than end date");
         if (collisionExists(reservation.getRoom_id(), startDate, endDate))
             throw new RuntimeException("Room reservation collision detected");
-        return reservationRepository.save(new Reservation(reservation)).getId();
+        return ResponseEntity.ok(reservationRepository.save(new Reservation(reservation)).getId());
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
-        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> compareDates(newStartDate, newEndDate, a.getStart_time(), a.getEnd_time())) || getByRoomId(roomId).stream().anyMatch(r -> r.is_confirmed() && compareDates(newStartDate, newEndDate, r.getStart_time(), r.getEnd_time()));
+        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> compareDates(newStartDate, newEndDate, a.getStart_time(), a.getEnd_time()));
     }
 
     private boolean compareDates(Date newStartDate, Date newEndDate, String startDateString, String endDateString) {

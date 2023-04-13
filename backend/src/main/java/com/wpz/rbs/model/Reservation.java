@@ -27,8 +27,6 @@ public class Reservation {
     private String end_time;
     @Column
     private int room_id;
-    @Column
-    private boolean is_confirmed;
 
     public Reservation() {
     }
@@ -40,6 +38,5 @@ public class Reservation {
         this.last_name = reservation.getLast_name();
         this.room_id = reservation.getRoom_id();
         this.name = reservation.getName();
-        this.is_confirmed = false;
     }
 }
