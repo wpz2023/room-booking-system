@@ -14,6 +14,8 @@ public class CreateReservation {
     @NotEmpty
     private String name;
     @NotEmpty
+    private String email;
+    @NotEmpty
     private String first_name;
     @NotEmpty
     private String last_name;

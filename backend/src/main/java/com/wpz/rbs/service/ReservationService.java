@@ -46,7 +46,7 @@ public class ReservationService {
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
-        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> compareDates(newStartDate, newEndDate, a.getStart_time(), a.getEnd_time())) || getByRoomId(roomId).stream().anyMatch(r -> compareDates(newStartDate, newEndDate, r.getStart_time(), r.getEnd_time()));
+        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> compareDates(newStartDate, newEndDate, a.getStart_time(), a.getEnd_time())) || getByRoomId(roomId).stream().anyMatch(r -> r.is_confirmed() && compareDates(newStartDate, newEndDate, r.getStart_time(), r.getEnd_time()));
     }
 
     private boolean compareDates(Date newStartDate, Date newEndDate, String startDateString, String endDateString) {
