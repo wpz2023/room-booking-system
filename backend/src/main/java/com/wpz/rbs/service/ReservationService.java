@@ -5,11 +5,11 @@ import com.wpz.rbs.model.reservation.CreateReservation;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.repository.ReservationRepository;
 import com.wpz.rbs.repository.RoomRepository;
+import com.wpz.rbs.utils.StaticHelpers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -18,13 +18,11 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ActivityRepository activityRepository;
     private final RoomRepository roomRepository;
-    private final SimpleDateFormat dateFormat;
 
     public ReservationService(ReservationRepository reservationRepository, ActivityRepository activityRepository, RoomRepository roomRepository) {
         this.reservationRepository = reservationRepository;
         this.activityRepository = activityRepository;
         this.roomRepository = roomRepository;
-        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
     public Reservation getById(int id) {
@@ -40,8 +38,8 @@ public class ReservationService {
     }
 
     public ResponseEntity<?> createReservation(CreateReservation reservation) throws ParseException {
-        Date startDate = dateFormat.parse(reservation.getStart_time());
-        Date endDate = dateFormat.parse(reservation.getEnd_time());
+        Date startDate = StaticHelpers.parseDateTime(reservation.getStart_time());
+        Date endDate = StaticHelpers.parseDateTime(reservation.getEnd_time());
         if (!roomRepository.existsById(reservation.getRoom_id()))
             return ResponseEntity.status(400).body("Wrong room id");
         if (startDate.compareTo(endDate) >= 0)
@@ -57,8 +55,8 @@ public class ReservationService {
 
     private boolean compareDates(Date newStartDate, Date newEndDate, String startDateString, String endDateString) {
         try {
-            Date startDate = dateFormat.parse(startDateString);
-            Date endDate = dateFormat.parse(endDateString);
+            Date startDate = StaticHelpers.parseDateTime(startDateString);
+            Date endDate = StaticHelpers.parseDateTime(endDateString);
             return ((newStartDate.compareTo(startDate) >= 0 && newStartDate.compareTo(endDate) <= 0) || (newEndDate.compareTo(startDate) >= 0 && newEndDate.compareTo(endDate) <= 0) || (newStartDate.compareTo(startDate) <= 0 && newEndDate.compareTo(endDate) >= 0));
         } catch (ParseException e) {
             throw new RuntimeException(e);
