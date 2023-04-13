@@ -28,6 +28,10 @@ Jak chcecie to z cmd budować to musicie mieć globalnie javę 17 a do tego pote
 
   `mvnw.cmd spring-boot:run`
 
+# Dokumentacja api 
+
+Dodany został działający swagger i po odpaleniu aplikacji backendowej dostępny jest pod http://localhost:8080/swagger-ui/index.html.
+
 # Baza danych
 
 H2
