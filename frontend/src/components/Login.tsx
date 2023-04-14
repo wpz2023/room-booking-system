@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Api from "../Api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -11,14 +11,14 @@ function Login() {
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [submitted, setSubmitted] = useState(false);
 
-  const authQuery = useQuery({
-    queryKey: ["auth"],
-    queryFn: () =>
-      Api.post("auth/authenticate", { email: email, password: password }).then(
-        (res) => res.data
-      ),
-    refetchOnWindowFocus: false,
-    enabled: false,
+  const tokenMutation = useMutation({
+    mutationFn: async () => {
+      let data = await Api.Api.post("auth/authenticate", {
+        email: email,
+        password: password,
+      }).then((res) => res.data);
+      return data;
+    },
   });
 
   const handeEmailChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -35,10 +35,15 @@ function Login() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    authQuery.refetch();
-    window.sessionStorage.setItem("jwtToken", authQuery.data?.token);
-    navigate("/import", { replace: true });
+    tokenMutation.mutate();
   };
+
+  useEffect(() => {
+    if (tokenMutation.isSuccess) {
+      window.sessionStorage.setItem("jwtToken", tokenMutation.data?.token);
+      navigate("/import", { replace: true });
+    }
+  }, [tokenMutation.isSuccess]);
 
   return (
     <div className="flex flex-col items-center pt-20">

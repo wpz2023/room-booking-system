@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 function Rooms() {
   const roomsQuery = useQuery<RoomData[]>({
     queryKey: ["rooms"],
-    queryFn: () => Api.get("room").then((res) => res.data),
+    queryFn: () => Api.Api.get("room").then((res) => res.data),
   });
 
   roomsQuery.data?.forEach((room) => (room.type = "Sala dydaktyczna"));

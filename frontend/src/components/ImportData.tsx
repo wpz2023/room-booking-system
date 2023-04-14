@@ -5,15 +5,16 @@ import Api from "../Api";
 
 function ImportData() {
   let token = window.sessionStorage.getItem("jwtToken");
+
   const getImportRooms = () => {
-    return Api.get("import/room", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    return Api.authApi
+      .get("import/room", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch();
   };
 
   const handleClick = () => {
@@ -31,7 +32,6 @@ function ImportData() {
 
   useEffect(() => {
     token = window.sessionStorage.getItem("jwtToken");
-    console.log(token);
   }, [token]);
 
   return (
