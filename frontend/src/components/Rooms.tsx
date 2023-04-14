@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 function Rooms() {
   const roomsQuery = useQuery<RoomData[]>({
     queryKey: ["rooms"],
-    queryFn: () => Api.get("room").then((res) => res.data),
+    queryFn: () => Api.Api.get("room").then((res) => res.data),
   });
 
   roomsQuery.data?.forEach((room) => (room.type = "Sala dydaktyczna"));
@@ -18,7 +18,7 @@ function Rooms() {
       ) : (
         <div className="grid grid-cols-3 gap-8">
           {roomsQuery.data?.map((room) => (
-            <Link to={room.id.toString()}>
+            <Link to={room.id.toString()} key={room.id}>
               <div className="bg-gray-200 rounded-lg shadow-lg p-6">
                 <h2 className="text-lg font-bold mb-4">{room.number}</h2>
                 <p className="text-sm mb-2">
