@@ -18,11 +18,13 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ActivityRepository activityRepository;
     private final RoomRepository roomRepository;
+    private final EmailService emailService;
 
-    public ReservationService(ReservationRepository reservationRepository, ActivityRepository activityRepository, RoomRepository roomRepository) {
+    public ReservationService(ReservationRepository reservationRepository, ActivityRepository activityRepository, RoomRepository roomRepository, EmailService emailService) {
         this.reservationRepository = reservationRepository;
         this.activityRepository = activityRepository;
         this.roomRepository = roomRepository;
+        this.emailService = emailService;
     }
 
     public Reservation getById(int id) {
@@ -46,7 +48,10 @@ public class ReservationService {
             return ResponseEntity.status(400).body("Start date is later than end date");
         if (collisionExists(reservation.getRoom_id(), startDate, endDate))
             return ResponseEntity.status(409).body("Room reservation collision detected");
-        return ResponseEntity.ok(reservationRepository.save(new Reservation(reservation)).getId());
+
+        Reservation savedReservation = reservationRepository.save(new Reservation(reservation));
+        emailService.sendMessageToAdmin(savedReservation);
+        return ResponseEntity.ok(savedReservation.getId());
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
@@ -54,7 +59,7 @@ public class ReservationService {
             try {
                 Date startDate = StaticHelpers.parseDateTime(a.getStart_time());
                 Date endDate = StaticHelpers.parseDateTime(a.getEnd_time());
-                return StaticHelpers.activitiesNotOverlapping(newStartDate, newEndDate, startDate, endDate);
+                return StaticHelpers.activitiesOverlapping(newStartDate, newEndDate, startDate, endDate);
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
