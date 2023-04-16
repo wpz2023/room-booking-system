@@ -1,14 +1,12 @@
 package com.wpz.rbs.service;
 
+import com.wpz.rbs.model.Lecturer;
+import com.wpz.rbs.repository.LecturerRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.wpz.rbs.model.Lecturer;
-import com.wpz.rbs.repository.LecturerRepository;
 
 @Service
 public class LecturerService {
@@ -26,7 +24,7 @@ public class LecturerService {
     }
 
     public Lecturer getById(int id) {
-        return lecturerRepository.findById(id).get();
+        return lecturerRepository.findById(id).orElse(null);
     }
 
     public Optional<Lecturer> getByIdOptional(int id) {
