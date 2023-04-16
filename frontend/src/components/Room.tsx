@@ -1,13 +1,13 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import {useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
-import {Calendar, Views} from 'react-big-calendar';
+import {Calendar, DateLocalizer, Views} from 'react-big-calendar';
 import 'moment/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import {dateFnsLocalizer} from "react-big-calendar";
+import {dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -16,6 +16,7 @@ import {pl} from "date-fns/locale";
 import {Lecturer} from "../models/Lecturer";
 
 
+// model rezerwacji do wyświetlenia w kalendarzu
 interface EventData {
     start: Date;
     end: Date;
@@ -23,6 +24,7 @@ interface EventData {
     classtype_name: Map<string, string>;
     group_number: number;
     lecturers: Set<Lecturer>;
+    text: string;
 }
 
 interface EventProps {
@@ -36,30 +38,35 @@ interface EventProps {
 }
 
 
+// ustawienie zawartości eventu do wyświetlenia w kalendarzu oraz dostasowanie rozmiaru tekstu
 const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endAccessor, allDayAccessor, tooltipAccessor, children }) => {
+    const eventRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (eventRef.current) {
+            const eventElement = eventRef.current;
+            const eventHeight = eventElement.offsetHeight;
+            const eventWidth = eventElement.offsetWidth;
+            // const scaleFactor =  Math.min(eventHeight / 165, eventWidth / 100);
+            const scaleFactor =  Math.max(Math.min(eventHeight / 110, eventWidth / 180), Math.min(eventHeight / 180, eventWidth / 110)) ;
+            const fontSize = 16 * scaleFactor;
+
+            eventRef.current.style.fontSize = `${fontSize}px`;
+        }
+    }, []);
+
     return (
-        <div className="rbc-event-content flex flex-col text-center">
-            {/*<div className="rbc-event-title">{event[titleAccessor]}</div>*/}
+        <div className="rbc-event-content text-center grid content-center " ref={eventRef}>
             {event.classtype_name && event.group_number &&
-                <div className="py-1 rbc-event-location">{event.classtype_name["pl"]}, gr.{event.group_number}</div>}
-            {event.course_name && <div className="pt-1 rbc-event-description">{event.course_name["pl"]} - </div>}
+                <div className="py-1 rbc-event-location">
+                    { event.classtype_name["pl"]}, gr.{event.group_number}
+                </div>}
+            {event.course_name &&
+                <div className="pt-1 rbc-event-description">
+                    {event.course_name["pl"]} -
+                </div>}
             { Array.from(event.lecturers).map((lecturer) => (
                   <p>{lecturer.first_name} {lecturer.last_name}</p>
-            ))}
-            {children}
-        </div>
-    );
-};
-
-const tooltipAccessor: React.FC<EventProps> =({ event, titleAccessor, startAccessor, endAccessor, allDayAccessor, tooltipAccessor, children }) => {
-    return (
-        <div className="rbc-event-content flex flex-col text-center">
-            {/*<div className="rbc-event-title">{event[titleAccessor]}</div>*/}
-            {event.classtype_name && event.group_number &&
-                <div className="py-1 rbc-event-location">{event.classtype_name["pl"]}, gr.{event.group_number}</div>}
-            {event.course_name && <div className="pt-1 rbc-event-description">{event.course_name["pl"]} - </div>}
-            { Array.from(event.lecturers).map((lecturer) => (
-                <p>{lecturer.first_name} {lecturer.last_name}</p>
             ))}
             {children}
         </div>
@@ -74,6 +81,7 @@ function Room() {
         return Api.get(`room/${id}`).then((res) => res.data);
     }
 
+    // zmienne do zarządzania informacjami nt. sali
     const {
         data: room,
         isFetching: isRoomFetching,
@@ -87,6 +95,7 @@ function Room() {
         return Api.get(`import/activity/${id}`).then((res) => res.data);
     }
 
+    // dane do zarządzania informacjami nt. rezerwacji danej sali
     const {
         data: activities,
         isFetching: isRoomActivitiesFetching,
@@ -102,6 +111,7 @@ function Room() {
     }, []);
 
 
+    // ustawienie języka
     const locales = {
         pl: pl,
     };
@@ -114,6 +124,32 @@ function Room() {
         locales,
     });
 
+
+    // zmiana nazwy typu zajęć na krótszą formę
+    const changeClasstypeName = (classType: Map<string, string>) => {
+        if (classType["pl"]=="Wykład"){
+            classType["pl"] = "WYK"
+        } else if (classType["pl"]=="Ćwiczenia"){
+            classType["pl"] =  "CW"
+        } else if (classType["pl"]=="Konwersatorium"){
+            classType["pl"] = "KON"
+        } else if (classType["pl"]=="Laboratorium"){
+            classType["pl"] = "LAB"
+        } else if (classType["pl"]=="Seminarium"){
+            classType["pl"] = "SEM"
+        } else if (classType["pl"]=="Pracownia"){
+            classType["pl"] = "PRA"
+        } else if (classType["pl"]=="Pracownia komputerowa"){
+            classType["pl"] = "PKO"
+        } else if (classType["pl"]=="Lektorat"){
+            classType["pl"] = "LEK"
+        } else if (classType["pl"]=="Warsztat"){
+            classType["pl"] = "WAR"
+        }
+        return classType;
+    }
+
+    // utworzenie tablicy z informacjami nt. rezerwacji, która jest wyświetlana w kalendarzu
     const roomActivities = activities?.map(activity => ({
         ...activity,
          start: new Date(Number(activity.start_time.substring(0,4)), //year
@@ -122,7 +158,6 @@ function Room() {
             Number(activity.start_time.substring(11,13)), // hour
             Number(activity.start_time.substring(14,16)), // minute
             ),
-
         end: new Date(Number(activity.end_time.substring(0,4)), //year
             Number(activity.end_time.substring(5,7))-1, // month
             Number(activity.end_time.substring(8,10)), // day
@@ -130,17 +165,29 @@ function Room() {
             Number(activity.end_time.substring(14,16)), // minute
         ),
         course_name: activity.course_name,
-        classtype_name: activity.classtype_name,
+        classtype_name: changeClasstypeName(activity.classtype_name),//activity.classtype_name,
         group_number: activity.group_number,
         lecturers: activity.lecturers,
+        text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
     } ));
 
-    console.log(roomActivities);
+    // wyświetlenie danych po najechaniu kursorem na event w kalendarzu
+    const tooltipAccessor = (event: EventData) => {
+        let lecturers_txt = '';
 
+        Array.from(event.lecturers).map((lecturer, index) => {
+            lecturers_txt = lecturers_txt.concat(lecturer.first_name.toString() + " " + lecturer.last_name.toString());
+            if (Array.from(event.lecturers).length>1 && index<Array.from(event.lecturers).length-1){
+                lecturers_txt = lecturers_txt.concat(", ");
+            }
+        })
+
+        return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
+    }
 
 
     return (
-        <div className="container mx-auto py-10">
+        <div className=" mx-16 py-10">
             <div className="flex flex-col items-center text-center">
                 <h1 className="text-3xl font-bold mb-4">Sala</h1>
                 {isRoomFetching ? (
@@ -166,44 +213,48 @@ function Room() {
                 {isRoomActivitiesFetching ? (
                     <div className="mt-8 text-center">Ładowanie danych...</div>
                 ) : (
-                    <div className="mx-32">
-                        <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
-                        <Calendar
-                            culture={"pl"}
-                            localizer={localizer}
-                            events={roomActivities}
-                            defaultView={Views.WEEK}
-                            views={[Views.WEEK]}
-                            components={{
-                                event: Event
-                            }}
-                            step={15}
-                            timeslots={4}
-                            // tooltipAccessor={tooltipAccessor}
-                            dayLayoutAlgorithm="no-overlap"
-                            startAccessor="start"
-                            endAccessor="end"
-                            style={{height: '100vh'}}
-                            min={new Date(0, 0, 0, 6, 0, 0)}
-                            max={new Date(0, 0, 0, 22, 0, 0)}
-                            messages={{
-                                allDay: 'Cały dzień',
-                                previous: 'Poprzedni',
-                                next: 'Następny',
-                                today: 'Dziś',
-                                month: 'Miesiąc',
-                                week: 'Tydzień',
-                                day: 'Dzień',
-                                date: 'Data',
-                                time: 'Czas',
-                                event: 'Wydarzenie',
-                            }}
-                        />
+                    <div>
+                        <div className="flex flex-col my-8">
+                            <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
+                            <div>
+                                <Calendar
+                                    culture={"pl"}
+                                    localizer={localizer}
+                                    events={roomActivities}
+                                    defaultView={Views.WEEK}
+                                    views={[Views.WEEK]}
+                                    components={{
+                                        event: Event
+                                    }}
+                                    step={15}
+                                    // timeslots={4}
+                                    tooltipAccessor={tooltipAccessor}
+                                    dayLayoutAlgorithm="no-overlap"
+                                    startAccessor="start"
+                                    endAccessor="end"
+                                    style={{height: 'full'}}
+                                    min={new Date(0, 0, 0, 6, 0, 0)}
+                                    max={new Date(0, 0, 0, 22, 0, 0)}
+                                    messages={{
+                                        allDay: 'Cały dzień',
+                                        previous: 'Poprzedni',
+                                        next: 'Następny',
+                                        today: 'Dziś',
+                                        day: 'Dzień',
+                                        date: 'Data',
+                                        time: 'Czas',
+                                        event: 'Wydarzenie',
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <p>tutaj dodanie rezerwacji</p>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
         </div>
-
     );
 }
 
