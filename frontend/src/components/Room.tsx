@@ -1,10 +1,10 @@
-import React, {useEffect, useRef} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
-import {Calendar, DateLocalizer, Views} from 'react-big-calendar';
+import {Calendar, DateLocalizer, View, Views} from 'react-big-calendar';
 import 'moment/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import {dateFnsLocalizer } from "react-big-calendar";
@@ -47,8 +47,8 @@ const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endA
             const eventElement = eventRef.current;
             const eventHeight = eventElement.offsetHeight;
             const eventWidth = eventElement.offsetWidth;
-            // const scaleFactor =  Math.min(eventHeight / 165, eventWidth / 100);
-            const scaleFactor =  Math.max(Math.min(eventHeight / 110, eventWidth / 180), Math.min(eventHeight / 180, eventWidth / 110)) ;
+            // const scaleFactor =  Math.min(eventHeight / 100, eventWidth / 180); // dla szerokich niskich
+            const scaleFactor =  Math.max(Math.min(eventHeight / 120, eventWidth / 210), Math.min(eventHeight / 210, eventWidth / 120)) ;
             const fontSize = 16 * scaleFactor;
 
             eventRef.current.style.fontSize = `${fontSize}px`;
@@ -58,11 +58,11 @@ const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endA
     return (
         <div className="rbc-event-content text-center grid content-center " ref={eventRef}>
             {event.classtype_name && event.group_number &&
-                <div className="py-1 rbc-event-location">
+                <div className="mb-1.5 rbc-event-location">
                     { event.classtype_name["pl"]}, gr.{event.group_number}
                 </div>}
             {event.course_name &&
-                <div className="pt-1 rbc-event-description">
+                <div className="rbc-event-description">
                     {event.course_name["pl"]} -
                 </div>}
             { Array.from(event.lecturers).map((lecturer) => (
@@ -73,6 +73,10 @@ const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endA
     );
 };
 
+
+type MyCalendarProps = {
+    events: EventData[];
+};
 
 function Room() {
     const {id} = useParams();
@@ -92,7 +96,10 @@ function Room() {
     });
 
     const getRoomActivities = () => {
-        return Api.get(`import/activity/${id}`).then((res) => res.data);
+        console.log("DATA:" +  currentDate)
+        // return Api.get(`import/activity/${id}`).then((res) => res.data);
+        // return Api.get(`activity/room/${id}/week?startTime=2023-04-17`).then((res) => res.data);
+        return Api.get(`activity/room/${id}/week?startTime=${currentDate}`).then((res) => res.data);
     }
 
     // dane do zarządzania informacjami nt. rezerwacji danej sali
@@ -150,7 +157,7 @@ function Room() {
     }
 
     // utworzenie tablicy z informacjami nt. rezerwacji, która jest wyświetlana w kalendarzu
-    const roomActivities = activities?.map(activity => ({
+    let roomActivities = activities?.map(activity => ({
         ...activity,
          start: new Date(Number(activity.start_time.substring(0,4)), //year
             Number(activity.start_time.substring(5,7))-1, // month
@@ -184,6 +191,57 @@ function Room() {
 
         return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
     }
+
+
+    // const handleNavigate = (newDateRange: Date[], view: View) => {
+    //     if (view === 'week' && newDateRange[0].getDate() > 7) {
+    //         return myFunction();
+    //     }
+    // };
+
+
+
+    // const [date, setDate] = useState(new Date(2015, 3, 1))
+    // const onNavigate = useCallback((newDate) => {
+    //     setDate(newDate);
+    //     console.log("newdate: " + date);
+    //     getRoomActivities();
+    // }, [setDate])
+    //
+    // const onRangeChange = useCallback((range) => {
+    //     console.log(range)
+    //     // window.alert(buildMessage(range))
+    // }, [])
+
+    // const [currentDate, setCurrentDate] = useState<String>('');
+
+
+
+
+
+
+
+
+
+
+
+    let currentDate = '2023-04-10';
+
+    const handleNavigate = useCallback((newDateRange) => {
+        const date = `${newDateRange.getFullYear()}-${newDateRange.getMonth()+1}-${newDateRange.getDate()-6}`
+        console.log("start: " +  date );
+        currentDate = date;
+        // setCurrentDate(date);
+        // getRoomActivities();
+
+        // tutaj zaktualizowanie listy "activities"
+
+        console.log(activities)
+
+    }, []);
+
+
+
 
 
     return (
@@ -229,6 +287,13 @@ function Room() {
                                     step={15}
                                     // timeslots={4}
                                     tooltipAccessor={tooltipAccessor}
+
+                                    // defaultDate={defaultRange.start}
+                                    // date={currentRange.length > 0 ? currentRange[0] : defaultRange.start}
+                                    onNavigate={handleNavigate}
+
+                                    // onNavigate={onNavigate}
+                                    // onRangeChange={handleNavigate}
                                     dayLayoutAlgorithm="no-overlap"
                                     startAccessor="start"
                                     endAccessor="end"
@@ -256,6 +321,11 @@ function Room() {
             </div>
         </div>
     );
+}
+
+function myFunction() {
+    console.log('Next week button clicked!');
+    return "";
 }
 
 export default Room;
