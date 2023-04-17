@@ -38,9 +38,9 @@ public class ActivityImportService {
 
         //Check if first import, based on first week activities of previous october
         var lastOctober = StaticHelpers.getPreviousOctober(date);
-        var fisrtWeekeActivities = activityService.getByRoomIdForNextWeek(roomId, StaticHelpers.dateToString(lastOctober))
+        var fisrtWeekActivities = activityService.getByRoomIdForNextWeek(roomId, StaticHelpers.dateToString(lastOctober))
             .stream().filter(activity->activity.getIs_usos()).toList();
-        if(fisrtWeekeActivities.size() == 0)
+        if(fisrtWeekActivities.size() == 0)
             date = lastOctober;
 
         date = StaticHelpers.dateTimeToDate(date);

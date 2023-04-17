@@ -64,7 +64,7 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public List<ActivityConflict> getConflictsRoom(int roomId){
+    public List<ActivityConflict> getConflictsRoom(int roomId) throws ParseException{
         var activities = activityRepository.findAllByRoom_Id(roomId);
 
         var conflicts = new ArrayList<ActivityConflict>();
@@ -77,12 +77,14 @@ public class ActivityService {
                 if(activity1.getIs_usos() && activity2.getIs_usos())
                     continue;
 
-                var s1 = activity1.getStart_time(); var e1 = activity1.getEnd_time(); 
-                var s2 = activity1.getStart_time(); var e2 = activity1.getEnd_time(); 
 
-                if( (s2.compareTo(s1) >= 0 && s2.compareTo(e1) <= 0) || (s1.compareTo(s2) >= 0 && s1.compareTo(e2) <= 0) ){
-                    conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
-                }
+                if(StaticHelpers.activitiesOverlapping(
+                    StaticHelpers.parseDateTime(activity1.getStart_time()),
+                    StaticHelpers.parseDateTime(activity1.getEnd_time()),
+                    StaticHelpers.parseDateTime(activity2.getStart_time()),
+                    StaticHelpers.parseDateTime(activity2.getEnd_time()) )){
+                        conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
+                    }
             }
         }
 
