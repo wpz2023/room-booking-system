@@ -1,6 +1,7 @@
 package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Activity;
+import com.wpz.rbs.model.ActivityConflict;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.utils.StaticHelpers;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,49 @@ public class ActivityService {
         }).toList();
     }
 
+    public void clearUsosFromTo(Date startDate, Date endDate){
+        activityRepository.findAll().forEach(activity -> {
+            if(activity.getIs_usos() == false) return;
+
+            Date date = new Date();
+            try{
+                date = StaticHelpers.parseDate(activity.getStart_time());
+            } catch(ParseException e){
+                return;
+            }
+
+            if( date.compareTo(startDate) >= 0 && date.compareTo(endDate) < 0 ){
+                activityRepository.delete(activity);
+            }
+        });
+    }
+
     public Activity saveOrUpdate(Activity activity) {
         return activityRepository.save(activity);
+    }
+
+    public List<ActivityConflict> getConflictsRoom(int roomId){
+        var activities = activityRepository.findAllByRoom_Id(roomId);
+
+        var conflicts = new ArrayList<ActivityConflict>();
+
+        for(var i = 0; i < activities.size(); ++i){
+            var activity1 = activities.get(i);
+            for(var j = i + 1; j < activities.size(); ++j){
+                var activity2 = activities.get(j);
+
+                if(activity1.getIs_usos() && activity2.getIs_usos())
+                    continue;
+
+                var s1 = activity1.getStart_time(); var e1 = activity1.getEnd_time(); 
+                var s2 = activity1.getStart_time(); var e2 = activity1.getEnd_time(); 
+
+                if( (s2.compareTo(s1) >= 0 && s2.compareTo(e1) <= 0) || (s1.compareTo(s2) >= 0 && s1.compareTo(e2) <= 0) ){
+                    conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
+                }
+            }
+        }
+
+        return conflicts;
     }
 }

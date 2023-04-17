@@ -17,10 +17,31 @@ public class StaticHelpers {
         return dateFormat.parse(date);
     }
 
+    public static String dateToString(Date date) throws ParseException {
+        return dateFormat.format(date);
+    }
+
+    public static Date dateTimeToDate(Date date) throws ParseException {
+        return dateFormat.parse(dateFormat.format(date));
+    }
+
     public static Date addDays(Date date, int days) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         c.add(Calendar.DATE, days);
+        return c.getTime();
+    }
+
+    public static Date getPreviousOctober(Date date){
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+
+        if(c.get(Calendar.MONTH) < Calendar.OCTOBER){
+            c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 1);
+        }
+        c.set(Calendar.MONTH, Calendar.OCTOBER);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        
         return c.getTime();
     }
 

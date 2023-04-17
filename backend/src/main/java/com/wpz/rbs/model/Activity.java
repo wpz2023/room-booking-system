@@ -27,7 +27,7 @@ import lombok.Setter;
 public class Activity {
 
     public Activity(String type, String start_time, String end_time, String url, 
-    Map<String, String> course_name, Map<String, String> classtype_name, int group_number, int room_id){
+    Map<String, String> course_name, Map<String, String> classtype_name, int group_number, int room_id, Boolean is_usos){
         this.id = room_id + ":" + group_number + ":" + start_time + ":" + end_time + ":" + url;
 
         this.type = type;
@@ -38,6 +38,7 @@ public class Activity {
         this.classtype_name = classtype_name; 
         this.group_number = group_number;
         this.room_id = room_id;
+        this.is_usos = is_usos;
     }
 
     @Id
@@ -71,6 +72,9 @@ public class Activity {
 
     @Column
     private int room_id;
+
+    @Column
+    private Boolean is_usos;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(

@@ -1,6 +1,7 @@
 package com.wpz.rbs.controller;
 
 import com.wpz.rbs.model.Activity;
+import com.wpz.rbs.model.ActivityConflict;
 import com.wpz.rbs.service.ActivityService;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,5 +35,10 @@ public class ActivityController {
     @GetMapping("room/{id}/week")
     private List<Activity> getByRoomIdForNextWeek(@PathVariable("id") int roomId, @NotEmpty String startTime) throws ParseException {
         return activityService.getByRoomIdForNextWeek(roomId, startTime);
+    }
+
+    @GetMapping("room/{id}/conflicts")
+    private List<ActivityConflict> getConflictsByRoomId(@PathVariable("id") int roomId) throws ParseException {
+        return activityService.getConflictsRoom(roomId);
     }
 }
