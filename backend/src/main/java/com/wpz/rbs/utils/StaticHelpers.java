@@ -45,7 +45,9 @@ public class StaticHelpers {
         return c.getTime();
     }
 
-    public static boolean activitiesNotOverlapping(Date startDate1, Date endDate1, Date startDate2, Date endDate2) {
-        return !((startDate1.compareTo(startDate2) >= 0 && startDate1.compareTo(endDate2) <= 0) || (endDate1.compareTo(startDate2) >= 0 && endDate1.compareTo(endDate2) <= 0) || (startDate1.compareTo(startDate2) <= 0 && endDate1.compareTo(endDate2) >= 0));
+    public static boolean activitiesOverlapping(Date startDate1, Date endDate1, Date startDate2, Date endDate2) {
+        boolean condition1 = endDate1.compareTo(startDate2) <= 0;
+        boolean condition2 = startDate1.compareTo(endDate2) >= 0;
+        return !(condition1 || condition2);
     }
 }
