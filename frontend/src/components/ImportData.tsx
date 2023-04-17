@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Api from "../Api";
 
 function ImportData() {
-  let token = window.sessionStorage.getItem("jwtToken");
+  const token = window.sessionStorage.getItem("jwtToken");
 
   const getImportRooms = () => {
     return Api.authApi
@@ -29,10 +29,6 @@ function ImportData() {
       enabled: false,
     }
   );
-
-  useEffect(() => {
-    token = window.sessionStorage.getItem("jwtToken");
-  }, [token]);
 
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
