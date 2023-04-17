@@ -13,8 +13,7 @@ function ImportData() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => res.data)
-      .catch();
+      .then((res) => res.data);
   };
 
   const handleClick = () => {
