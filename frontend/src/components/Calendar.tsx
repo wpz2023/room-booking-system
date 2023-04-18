@@ -28,7 +28,6 @@ const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endA
             const eventElement = eventRef.current;
             const eventHeight = eventElement.offsetHeight;
             const eventWidth = eventElement.offsetWidth;
-            // const scaleFactor =  Math.min(eventHeight / 100, eventWidth / 180); // dla szerokich niskich
             const scaleFactor =  Math.max(Math.min(eventHeight / 120, eventWidth / 210), Math.min(eventHeight / 210, eventWidth / 120)) ;
             const fontSize = 16 * scaleFactor;
 
@@ -58,7 +57,6 @@ const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endA
 function NewCalendar(
     {activities, tooltipAccessor, handleNavigate, calendarDate},
 ) {
-
 
     const locales = {
         pl: pl,

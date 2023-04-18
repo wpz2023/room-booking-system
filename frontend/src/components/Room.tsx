@@ -1,6 +1,6 @@
-import React, { useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useParams} from "react-router";
-import {useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity, EventData} from "../models/Activity";
@@ -25,32 +25,33 @@ function Room() {
         data: room,
         isFetching: isRoomFetching,
         refetch: refetchRoom
-    } = useQuery<RoomData>(["room_info", currentDate], getRoomInfo, {
+    } = useQuery<RoomData>(["room_info"], getRoomInfo, {
         refetchOnWindowFocus: false,
         enabled: true
     });
 
-    const getRoomActivities = () => {
-        console.log("DAta do kalendarza teraz jest taka : "+ calendarDate )
+    const getRoomActivities = async () => {
+        console.log("getRoomActivities calendarDate: "+ calendarDate )
 
         if (currentDate == ''){
-            var todayDate = new Date().toISOString().slice(0, 10);
-            console.log("DATA getRoomActivities:" +  todayDate)
-            return Api.get(`activity/room/${id}/week?startTime=${todayDate}`).then((res) => res.data);
+            var todayDate = new Date()
+            var date = `${todayDate.getFullYear()}-${todayDate.getMonth()+1}-${todayDate.getDate()-todayDate.getDay()+1}`
+            console.log("getRoomActivities todayDate:" +  date)
+            return await Api.get(`activity/room/${id}/week?startTime=${date}`).then((res) => res.data);
         } else {
-            console.log("DATA getRoomActivities:" +  currentDate)
-            return Api.get(`activity/room/${id}/week?startTime=${currentDate}`).then((res) => res.data);
+            console.log("getRoomActivities currentDate:" +  currentDate)
+            return await Api.get(`activity/room/${id}/week?startTime=${currentDate}`).then((res) => res.data);
         }
     }
 
     // dane do zarządzania informacjami nt. rezerwacji danej sali
-    const {
+    let {
         data: activities,
         isFetching: isRoomActivitiesFetching,
         refetch: refetchActivities
     } = useQuery<Activity[]>(["activities"], getRoomActivities, {
         refetchOnWindowFocus: false,
-        enabled: true // false
+        enabled: true
     });
 
     useEffect(() => {
@@ -84,7 +85,10 @@ function Room() {
     }
 
     // utworzenie tablicy z informacjami nt. rezerwacji, która jest wyświetlana w kalendarzu
-    let roomActivities = activities?.map(activity => ({
+
+    const [roomActivities, setRoomActivities] = useState<EventData[]>()
+
+    let test = activities?.map(activity => ({
         ...activity,
          start: new Date(Number(activity.start_time.substring(0,4)), //year
             Number(activity.start_time.substring(5,7))-1, // month
@@ -99,13 +103,17 @@ function Room() {
             Number(activity.end_time.substring(14,16)), // minute
         ),
         course_name: activity.course_name,
-        classtype_name: changeClasstypeName(activity.classtype_name),//activity.classtype_name,
+        classtype_name: changeClasstypeName(activity.classtype_name),
         group_number: activity.group_number,
         lecturers: activity.lecturers,
         text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
     } ));
 
-    // wyświetlenie danych po najechaniu kursorem na event w kalendarzu
+    useEffect(() => {
+        setRoomActivities(test)
+    }, [])
+
+    // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
     const tooltipAccessor = (event: EventData) => {
         let lecturers_txt = '';
 
@@ -119,16 +127,46 @@ function Room() {
         return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
     }
 
+
+    // do pobrania nowych rezerwacji po zmianie tygodnia w kalendarzu
     const handleNavigate = ((newDateRange) => {
-        const date = `${newDateRange.getFullYear()}-${newDateRange.getMonth()+1}-${newDateRange.getDate()}`
-        // console.log("start: " +  date );
-        setCurrentCalendarDate(new Date(newDateRange.getFullYear(), newDateRange.getMonth(), newDateRange.getDate()))
-        console.log("UPDATED : " + calendarDate)
+        const date = `${newDateRange.getFullYear()}-${newDateRange.getMonth()+1}-${newDateRange.getDate() - newDateRange.getDay()+1}`
+        setCurrentCalendarDate(new Date(newDateRange.getFullYear(), newDateRange.getMonth(), newDateRange.getDate()-newDateRange.getDay()+1))
+        console.log("UPDATED calendarDate: " + calendarDate)
         setCurrendDate(date)
-        console.log("update current date: " + currentDate)
-        refetchActivities()
+        console.log("UPDATED currentDate: " + currentDate)
+
     });
 
+    useEffect ( () => {
+        getRoomActivities();
+
+        var test = activities?.map(activity => ({
+            ...activity,
+            start: new Date(Number(activity.start_time.substring(0,4)), //year
+                Number(activity.start_time.substring(5,7))-1, // month
+                Number(activity.start_time.substring(8,10)), // day
+                Number(activity.start_time.substring(11,13)), // hour
+                Number(activity.start_time.substring(14,16)), // minute
+            ),
+            end: new Date(Number(activity.end_time.substring(0,4)), //year
+                Number(activity.end_time.substring(5,7))-1, // month
+                Number(activity.end_time.substring(8,10)), // day
+                Number(activity.end_time.substring(11,13)), // hour
+                Number(activity.end_time.substring(14,16)), // minute
+            ),
+            course_name: activity.course_name,
+            classtype_name: changeClasstypeName(activity.classtype_name),
+            group_number: activity.group_number,
+            lecturers: activity.lecturers,
+            text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
+        } ));
+
+        setRoomActivities(test)
+        console.log('---------mam activities--------------')
+        console.log(activities)
+
+    }, [currentDate]);
 
 
     return (
