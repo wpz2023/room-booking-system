@@ -20,7 +20,7 @@ interface EventProps {
 
 
 
-const Event: React.FC<EventProps> = ({ event, titleAccessor, startAccessor, endAccessor, allDayAccessor, tooltipAccessor, children }) => {
+const Event: React.FC<EventProps> = ({ event, children }) => {
     const eventRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -86,14 +86,11 @@ function NewCalendar(
             // timeslots={4}
             tooltipAccessor={tooltipAccessor}
             onNavigate={handleNavigate}
-
             dayLayoutAlgorithm="no-overlap"
             startAccessor="start"
             endAccessor="end"
             style={{height: 'full'}}
             min={new Date(0, 0, 0, 6, 0, 0)}
-            // min={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate(), 6, 0, 0)}
-            // max={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate()+6, 22, 0, 0)}
             max={new Date(0, 0, 0, 22, 0, 0)}
             messages={{
                 allDay: 'Cały dzień',

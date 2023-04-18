@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import { format } from 'date-fns';
 import {useParams} from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
@@ -33,10 +32,8 @@ function Room() {
         if (currentDate == ''){
             var todayDate = new Date()
             var date = `${todayDate.getFullYear()}-${todayDate.getMonth()+1}-${todayDate.getDate()-todayDate.getDay()+1}`
-            console.log("getRoomActivities todayDate:" +  date)
             return await Api.get(`activity/room/${id}/week?startTime=${date}`).then((res) => res.data);
         } else {
-            console.log("getRoomActivities currentDate:" +  currentDate)
             return await Api.get(`activity/room/${id}/week?startTime=${currentDate}`).then((res) => res.data);
         }
     }
@@ -82,7 +79,6 @@ function Room() {
     }
 
     // utworzenie tablicy z informacjami nt. rezerwacji, która jest wyświetlana w kalendarzu
-
     const [roomActivities, setRoomActivities] = useState<EventData[]>([])
 
     // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
@@ -104,8 +100,6 @@ function Room() {
     const handleNavigate = ((newDateRange: Date) => {
         const date = `${newDateRange.getFullYear()}-${newDateRange.getMonth()+1}-${newDateRange.getDate() - newDateRange.getDay()+1}`
         setCurrendDate(date)
-        console.log("UPDATED currentDate: " + currentDate)
-
     });
 
     useEffect ( () => {
@@ -131,9 +125,6 @@ function Room() {
         } ));
 
         setRoomActivities(test)
-        console.log('---------mam activities--------------')
-        console.log(activities)
-
     }, [activities]);
 
 
