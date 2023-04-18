@@ -1,4 +1,5 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
+import { format } from 'date-fns';
 import {useParams} from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
@@ -9,12 +10,10 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NewCalendar from "./Calendar";
 
 
-
 function Room() {
     const {id} = useParams();
 
-    const[currentDate, setCurrendDate] = useState('');
-    const[calendarDate, setCurrentCalendarDate] = useState(new Date());
+    const[currentDate, setCurrendDate] = useState<String>('');
 
     const getRoomInfo = () => {
         return Api.get(`room/${id}`).then((res) => res.data);
@@ -31,8 +30,6 @@ function Room() {
     });
 
     const getRoomActivities = async () => {
-        console.log("getRoomActivities calendarDate: "+ calendarDate )
-
         if (currentDate == ''){
             var todayDate = new Date()
             var date = `${todayDate.getFullYear()}-${todayDate.getMonth()+1}-${todayDate.getDate()-todayDate.getDay()+1}`
@@ -49,7 +46,7 @@ function Room() {
         data: activities,
         isFetching: isRoomActivitiesFetching,
         refetch: refetchActivities
-    } = useQuery<Activity[]>(["activities"], getRoomActivities, {
+    } = useQuery<Activity[]>(["activities", currentDate], getRoomActivities, {
         refetchOnWindowFocus: false,
         enabled: true
     });
@@ -86,32 +83,7 @@ function Room() {
 
     // utworzenie tablicy z informacjami nt. rezerwacji, która jest wyświetlana w kalendarzu
 
-    const [roomActivities, setRoomActivities] = useState<EventData[]>()
-
-    let test = activities?.map(activity => ({
-        ...activity,
-         start: new Date(Number(activity.start_time.substring(0,4)), //year
-            Number(activity.start_time.substring(5,7))-1, // month
-            Number(activity.start_time.substring(8,10)), // day
-            Number(activity.start_time.substring(11,13)), // hour
-            Number(activity.start_time.substring(14,16)), // minute
-            ),
-        end: new Date(Number(activity.end_time.substring(0,4)), //year
-            Number(activity.end_time.substring(5,7))-1, // month
-            Number(activity.end_time.substring(8,10)), // day
-            Number(activity.end_time.substring(11,13)), // hour
-            Number(activity.end_time.substring(14,16)), // minute
-        ),
-        course_name: activity.course_name,
-        classtype_name: changeClasstypeName(activity.classtype_name),
-        group_number: activity.group_number,
-        lecturers: activity.lecturers,
-        text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
-    } ));
-
-    useEffect(() => {
-        setRoomActivities(test)
-    }, [])
+    const [roomActivities, setRoomActivities] = useState<EventData[]>([])
 
     // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
     const tooltipAccessor = (event: EventData) => {
@@ -129,18 +101,14 @@ function Room() {
 
 
     // do pobrania nowych rezerwacji po zmianie tygodnia w kalendarzu
-    const handleNavigate = ((newDateRange) => {
+    const handleNavigate = ((newDateRange: Date) => {
         const date = `${newDateRange.getFullYear()}-${newDateRange.getMonth()+1}-${newDateRange.getDate() - newDateRange.getDay()+1}`
-        setCurrentCalendarDate(new Date(newDateRange.getFullYear(), newDateRange.getMonth(), newDateRange.getDate()-newDateRange.getDay()+1))
-        console.log("UPDATED calendarDate: " + calendarDate)
         setCurrendDate(date)
         console.log("UPDATED currentDate: " + currentDate)
 
     });
 
     useEffect ( () => {
-        getRoomActivities();
-
         var test = activities?.map(activity => ({
             ...activity,
             start: new Date(Number(activity.start_time.substring(0,4)), //year
@@ -166,7 +134,7 @@ function Room() {
         console.log('---------mam activities--------------')
         console.log(activities)
 
-    }, [currentDate]);
+    }, [activities]);
 
 
     return (
@@ -201,7 +169,7 @@ function Room() {
                             <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                             <div>
                                 <NewCalendar activities={roomActivities} tooltipAccessor={tooltipAccessor}
-                                             handleNavigate={handleNavigate} calendarDate={calendarDate}/>
+                                             handleNavigate={handleNavigate} calendarDate={currentDate}/>
                             </div>
                             <div>
                                 <p>tutaj dodanie rezerwacji</p>

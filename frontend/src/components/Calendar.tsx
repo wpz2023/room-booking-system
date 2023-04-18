@@ -73,6 +73,7 @@ function NewCalendar(
 
     return (
         <Calendar
+            date={calendarDate}
             culture={"pl"}
             localizer={localizer}
             events={activities}
@@ -90,10 +91,10 @@ function NewCalendar(
             startAccessor="start"
             endAccessor="end"
             style={{height: 'full'}}
-            // min={new Date(0, 0, 0, 6, 0, 0)}
-            min={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate(), 6, 0, 0)}
-            max={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate()+6, 22, 0, 0)}
-            // max={new Date(0, 0, 0, 22, 0, 0)}
+            min={new Date(0, 0, 0, 6, 0, 0)}
+            // min={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate(), 6, 0, 0)}
+            // max={new Date(calendarDate.getFullYear(),  calendarDate.getMonth(), calendarDate.getDate()+6, 22, 0, 0)}
+            max={new Date(0, 0, 0, 22, 0, 0)}
             messages={{
                 allDay: 'Cały dzień',
                 previous: 'Poprzedni',
