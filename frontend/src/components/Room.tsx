@@ -13,7 +13,7 @@ function Room() {
     const {id} = useParams();
 
     const getRoomInfo = () => {
-        return Api.get(`room/${id}`).then((res) => res.data);
+        return Api.Api.get(`room/${id}`).then((res) => res.data);
     }
 
     // zmienne do zarządzania informacjami nt. sali
@@ -28,7 +28,7 @@ function Room() {
     });
 
     const getRoomActivities =  () => {
-        return  Api.get(`activity/room/${id}`).then((res) => res.data);
+        return  Api.Api.get(`activity/room/${id}`).then((res) => res.data);
     }
 
     // dane do zarządzania informacjami nt. rezerwacji danej sali
