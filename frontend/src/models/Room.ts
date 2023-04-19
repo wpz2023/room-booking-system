@@ -6,4 +6,5 @@ export interface Room{
 export interface RoomData extends Room{
     type: string;
     capacity: number;
+    annotation: string;
 }

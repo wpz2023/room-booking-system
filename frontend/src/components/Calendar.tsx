@@ -55,7 +55,7 @@ const Event: React.FC<EventProps> = ({ event, children }) => {
 
 
 function NewCalendar(
-    {activities, tooltipAccessor, handleNavigate, calendarDate},
+    {activities, tooltipAccessor},
 ) {
 
     const locales = {
@@ -73,7 +73,6 @@ function NewCalendar(
 
     return (
         <Calendar
-            date={calendarDate}
             culture={"pl"}
             localizer={localizer}
             events={activities}
@@ -83,9 +82,7 @@ function NewCalendar(
                 event: Event
             }}
             step={15}
-            // timeslots={4}
             tooltipAccessor={tooltipAccessor}
-            onNavigate={handleNavigate}
             dayLayoutAlgorithm="no-overlap"
             startAccessor="start"
             endAccessor="end"
