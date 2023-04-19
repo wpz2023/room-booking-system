@@ -3,7 +3,7 @@ import {useParams} from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
 import Api from "../Api";
-import {Activity, EventData} from "../models/Activity";
+import {Activity} from "../models/Activity";
 import 'moment/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NewCalendar from "./Calendar";
@@ -71,22 +71,7 @@ function Room() {
         return classType;
     }
 
-
-    // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
-    const tooltipAccessor = (event: EventData) => {
-        let lecturers_txt = '';
-
-        Array.from(event.lecturers).map((lecturer, index) => {
-            lecturers_txt = lecturers_txt.concat(lecturer.first_name.toString() + " " + lecturer.last_name.toString());
-            if (Array.from(event.lecturers).length>1 && index<Array.from(event.lecturers).length-1){
-                lecturers_txt = lecturers_txt.concat(", ");
-            }
-        })
-
-        return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
-    }
-
-
+    // przechowuje eventy do wyświetlenia w kalendarzu
     const roomActivities = activities?.map(activity => ({
         ...activity,
         start: new Date(Number(activity.start_time.substring(0,4)), //year
@@ -140,7 +125,7 @@ function Room() {
                         <div className="flex flex-col my-8">
                             <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                             <div>
-                                <NewCalendar activities={roomActivities} tooltipAccessor={tooltipAccessor}/>
+                                <NewCalendar activities={roomActivities}/>
                             </div>
                             <div>
                                 <p>tutaj dodanie rezerwacji</p>

@@ -5,19 +5,23 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import {EventData} from "../models/Activity";
+import {Lecturer} from "../models/Lecturer";
 
 
 interface EventProps {
     event: EventData;
-    titleAccessor: keyof EventData;
-    startAccessor: keyof EventData;
-    endAccessor: keyof EventData;
-    allDayAccessor: keyof EventData;
-    tooltipAccessor?: keyof EventData;
     children?: React.ReactNode;
 }
 
+interface EventData {
+    start: Date;
+    end: Date;
+    course_name: Map<string, string>;
+    classtype_name: Map<string, string>;
+    group_number: number;
+    lecturers: Set<Lecturer>;
+    text: string;
+}
 
 
 const Event: React.FC<EventProps> = ({ event, children }) => {
@@ -55,20 +59,22 @@ const Event: React.FC<EventProps> = ({ event, children }) => {
 
 
 function NewCalendar(
-    {activities, tooltipAccessor},
+    {activities}: { activities: EventData[]}
 ) {
 
-    const locales = {
-        pl: pl,
-    };
+    // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
+    const tooltipAccessor = (event: EventData) => {
+        let lecturers_txt = '';
 
-    const localizer = dateFnsLocalizer({
-        format,
-        parse,
-        startOfWeek,
-        getDay,
-        locales,
-    });
+        Array.from(event.lecturers).map((lecturer, index) => {
+            lecturers_txt = lecturers_txt.concat(lecturer.first_name.toString() + " " + lecturer.last_name.toString());
+            if (Array.from(event.lecturers).length>1 && index<Array.from(event.lecturers).length-1){
+                lecturers_txt = lecturers_txt.concat(", ");
+            }
+        })
+
+        return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
+    }
 
 
     return (
@@ -102,5 +108,17 @@ function NewCalendar(
         />
     )
 }
+
+const locales = {
+    pl: pl,
+};
+
+const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
+});
 
 export default NewCalendar;
