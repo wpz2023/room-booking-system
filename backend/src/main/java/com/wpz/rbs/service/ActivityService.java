@@ -43,18 +43,18 @@ public class ActivityService {
         }).toList();
     }
 
-    public void clearUsosFromTo(Date startDate, Date endDate){
-        activityRepository.findAll().forEach(activity -> {
-            if(activity.getIs_usos() == false) return;
+    public void clearUsosFromTo(int roomId, Date startDate, Date endDate) {
+        activityRepository.findAllByRoom_Id(roomId).forEach(activity -> {
+            if (!activity.getIs_usos()) return;
 
             Date date = new Date();
-            try{
+            try {
                 date = StaticHelpers.parseDate(activity.getStart_time());
-            } catch(ParseException e){
+            } catch (ParseException e) {
                 return;
             }
 
-            if( date.compareTo(startDate) >= 0 && date.compareTo(endDate) < 0 ){
+            if (date.compareTo(startDate) >= 0 && date.compareTo(endDate) < 0) {
                 activityRepository.delete(activity);
             }
         });
@@ -64,27 +64,27 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public List<ActivityConflict> getConflictsRoom(int roomId) throws ParseException{
+    public List<ActivityConflict> getConflictsRoom(int roomId) throws ParseException {
         var activities = activityRepository.findAllByRoom_Id(roomId);
 
         var conflicts = new ArrayList<ActivityConflict>();
 
-        for(var i = 0; i < activities.size(); ++i){
+        for (var i = 0; i < activities.size(); ++i) {
             var activity1 = activities.get(i);
-            for(var j = i + 1; j < activities.size(); ++j){
+            for (var j = i + 1; j < activities.size(); ++j) {
                 var activity2 = activities.get(j);
 
-                if(activity1.getIs_usos() && activity2.getIs_usos())
+                if (activity1.getIs_usos() && activity2.getIs_usos())
                     continue;
 
 
-                if(StaticHelpers.activitiesOverlapping(
-                    StaticHelpers.parseDateTime(activity1.getStart_time()),
-                    StaticHelpers.parseDateTime(activity1.getEnd_time()),
-                    StaticHelpers.parseDateTime(activity2.getStart_time()),
-                    StaticHelpers.parseDateTime(activity2.getEnd_time()) )){
-                        conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
-                    }
+                if (StaticHelpers.activitiesOverlapping(
+                        StaticHelpers.parseDateTime(activity1.getStart_time()),
+                        StaticHelpers.parseDateTime(activity1.getEnd_time()),
+                        StaticHelpers.parseDateTime(activity2.getStart_time()),
+                        StaticHelpers.parseDateTime(activity2.getEnd_time()))) {
+                    conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
+                }
             }
         }
 

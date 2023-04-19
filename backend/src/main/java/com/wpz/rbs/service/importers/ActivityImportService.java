@@ -42,7 +42,7 @@ public class ActivityImportService {
             date = lastOctober;
 
         date = StaticHelpers.dateTimeToDate(date);
-        activityService.clearUsosFromTo(date, StaticHelpers.addDays(date, 365));
+        activityService.clearUsosFromTo(roomId, date, StaticHelpers.addDays(date, 365));
 
         List<Activity> activities = new ArrayList<>();
 
