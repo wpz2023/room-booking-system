@@ -13,7 +13,6 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.List;
 
 @Configuration
@@ -38,7 +37,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/import/**", "/room/update/**")
+                .requestMatchers("/import/**", "/room/update/**", "/room/*/conflicts")
                 .authenticated()
                 .anyRequest()
                 .permitAll()
@@ -55,7 +54,6 @@ public class SecurityConfiguration {
 
         return httpSecurity.build();
     }
-
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
