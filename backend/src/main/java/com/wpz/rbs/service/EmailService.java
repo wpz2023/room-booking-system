@@ -101,6 +101,27 @@ public class EmailService {
         }
     }
 
+    public void sendChangedMessageToUser(Reservation reservation) {
+        Room room = roomService.getById(reservation.getRoom_id());
+        String subject = "[System rezerwacji sal] Modyfikacja rezerwacji #" + reservation.getId() + " - " + reservation.getName().toLowerCase();
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("reservation_name", reservation.getName());
+        model.put("room_number", room.getNumber());
+        model.put("start_time", reservation.getStart_time());
+        model.put("end_time", reservation.getEnd_time());
+
+        Context thymeleafContext = new Context();
+        thymeleafContext.setVariables(model);
+
+        String htmlBody = thymeleafTemplateEngine.process("user-change-message.html", thymeleafContext);
+        try {
+            sendHtmlMessage(reservation.getEmail(), subject, htmlBody);
+        } catch (MessagingException e) {
+            System.err.println("Email was not send successfully");
+        }
+    }
+
     private void sendHtmlMessage(String to, String subject, String htmlBody) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
