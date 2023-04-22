@@ -29,7 +29,7 @@ function Rooms() {
               <div className="bg-gray-200 rounded-lg shadow-lg p-6">
                 <h2 className="text-lg font-bold mb-4">{room.number}</h2>
                 <p className="text-sm mb-2">
-                  <span className="font-bold">Rodzaj:</span> {room.annotation}
+                  <span className="font-bold">Rodzaj:</span> {room.roomAnnotation}
                 </p>
                 <p className="text-sm mb-2">
                   <span className="font-bold">Pojemność:</span> {room.capacity}

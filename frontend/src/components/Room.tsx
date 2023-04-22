@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
@@ -11,6 +11,11 @@ import NewCalendar from "./Calendar";
 
 function Room() {
     const {id} = useParams();
+    let token = window.sessionStorage.getItem("jwtToken");
+
+    useEffect(() => {
+        token = window.sessionStorage.getItem("jwtToken");
+    }, [token]);
 
     const getRoomInfo = () => {
         return Api.Api.get(`room/${id}`).then((res) => res.data);
@@ -27,7 +32,7 @@ function Room() {
         
     });
 
-    const getRoomActivities =  () => {
+    const getRoomActivities = () => {
         return  Api.Api.get(`activity/room/${id}`).then((res) => res.data);
     }
 
@@ -94,6 +99,44 @@ function Room() {
     } ));
 
 
+
+
+
+    const [roomAnnotation, setRoomAnnotation ] = useState(room?.roomAnnotation==undefined ? "test" : room?.roomAnnotation)
+
+    const roomAnnotationChange = (e) => {
+        setRoomAnnotation(e.target.value)
+    }
+
+    useEffect(() => {
+        console.log("mam teraz "+ roomAnnotation)
+        console.log("room.annotation = " + room?.roomAnnotation)
+
+        if (roomAnnotation !== room?.roomAnnotation && roomAnnotation !== "test" ) {
+            console.log("UPDATE")
+            const roomData = {
+                "roomAnnotation": roomAnnotation
+            }
+
+            const response = Api.authApi.patch(`room/update/${id}`,roomData,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+        }
+
+    }, [roomAnnotation]);
+
+
+    useEffect(() => {
+        refetchRoom()
+    }, [token]);
+
+    useEffect( () => {
+       setRoomAnnotation(String(room?.roomAnnotation))
+    }, [room])
+
+
     return (
         <div className=" mx-16 py-10">
             <div className="flex flex-col items-center text-center">
@@ -101,13 +144,27 @@ function Room() {
                 {isRoomFetching ? (
                     <p className="text-center">Ładowanie danych...</p>
                 ) : (
-                    <div className="w-52 text-start">
+                    <div className="w-60 text-start">
                         <p className="pb-4 text-4xl text-center font-bold">{room?.number}</p>
 
-                        <p className="mb-2 text-lg">
-                            <span className="font-bold">Rodzaj: </span>
-                            {room?.annotation}
-                        </p>
+                        {!token ? (
+                            <p className="mb-2 text-lg">
+                                <span className="font-bold">Rodzaj: </span>
+                                {room?.roomAnnotation}
+                            </p>
+                        ) : (
+                            <label className="mb-2 text-lg font-bold">Rodzaj:
+                                <select className="font-normal px-1" value={roomAnnotation} onChange={roomAnnotationChange}>
+                                    <option value="laboratoryjna">laboratoryjna</option>
+                                    <option value="wykładowa">wykładowa</option>
+                                    <option value="ćwiczeniowa">ćwiczeniowa</option>
+                                    <option value="komputerowa">komputerowa</option>
+                                    <option value="test"> </option>
+                                </select>
+                            </label>
+
+                        )}
+
 
                         <p className="mb-2 text-lg">
                             <span className="font-bold">Pojemność: </span>
