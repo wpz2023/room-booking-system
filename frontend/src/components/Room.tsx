@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
@@ -15,6 +15,10 @@ function Room() {
 
     useEffect(() => {
         token = window.sessionStorage.getItem("jwtToken");
+    }, [token]);
+
+    useEffect(() => {
+        refetchRoom()
     }, [token]);
 
     const getRoomInfo = () => {
@@ -99,41 +103,33 @@ function Room() {
     } ));
 
 
-
-
-
-    const [roomAnnotation, setRoomAnnotation ] = useState(room?.roomAnnotation==undefined ? "test" : room?.roomAnnotation)
+    const [roomAnnotation, setRoomAnnotation ] = useState(room?.roomAnnotation===null ? "" : String(room?.roomAnnotation))
 
     const roomAnnotationChange = (e) => {
+        e.preventDefault();
+        pushNewRoomAnnotation.mutate(e.target.value)
         setRoomAnnotation(e.target.value)
     }
 
-    useEffect(() => {
-        console.log("mam teraz "+ roomAnnotation)
-        console.log("room.annotation = " + room?.roomAnnotation)
-
-        if (roomAnnotation !== room?.roomAnnotation && roomAnnotation !== "test" ) {
-            console.log("UPDATE")
-            const roomData = {
-                "roomAnnotation": roomAnnotation
-            }
-
-            const response = Api.authApi.patch(`room/update/${id}`,roomData,{
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+    const pushNewRoomAnnotation = useMutation((newAnnotation) => {
+        const roomData = {
+            "roomAnnotation": newAnnotation
         }
 
-    }, [roomAnnotation]);
+        return Api.authApi.patch(`room/update/${id}`,roomData,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+    })
 
-
-    useEffect(() => {
-        refetchRoom()
-    }, [token]);
 
     useEffect( () => {
-       setRoomAnnotation(String(room?.roomAnnotation))
+        if (room?.roomAnnotation===null){
+            setRoomAnnotation("")
+        } else {
+            setRoomAnnotation(room?.roomAnnotation)
+        }
     }, [room])
 
 
@@ -153,18 +149,21 @@ function Room() {
                                 {room?.roomAnnotation}
                             </p>
                         ) : (
-                            <label className="mb-2 text-lg font-bold">Rodzaj:
-                                <select className="font-normal px-1" value={roomAnnotation} onChange={roomAnnotationChange}>
-                                    <option value="laboratoryjna">laboratoryjna</option>
-                                    <option value="wykładowa">wykładowa</option>
-                                    <option value="ćwiczeniowa">ćwiczeniowa</option>
-                                    <option value="komputerowa">komputerowa</option>
-                                    <option value="test"> </option>
-                                </select>
-                            </label>
-
+                            <div className="mb-2">
+                                <label className=" text-lg font-bold">Rodzaj:
+                                    <select value={roomAnnotation} onChange={roomAnnotationChange}
+                                            className="ml-1  font-normal text-center px-1 border-b-2 border-blue-500
+                                    hover:border-2 hover:border-blue-500 hover:rounded-md  focus:border-2
+                                    focus:border-blue-500 focus:rounded-md outline-none ">
+                                        <option value="laboratoryjna">laboratoryjna</option>
+                                        <option value="wykładowa">wykładowa</option>
+                                        <option value="ćwiczeniowa">ćwiczeniowa</option>
+                                        <option value="komputerowa">komputerowa</option>
+                                        <option value=""> </option>
+                                    </select>
+                                </label>
+                            </div>
                         )}
-
 
                         <p className="mb-2 text-lg">
                             <span className="font-bold">Pojemność: </span>
