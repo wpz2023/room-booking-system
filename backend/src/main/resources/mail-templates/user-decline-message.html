@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<h3>Poniższa rezerwacja została odrzucona przez administratora systemu.</h3>
+<p>
+    Nazwa rezerwacji: <b><span th:text="${reservation_name}"></span></b><br>
+    Sala: <b><span th:text="${room_number}"></span></b><br>
+    Data rozpoczęcia: <b><span th:text="${start_time}"></span></b><br>
+    Data zakończenia: <b><span th:text="${end_time}"></span></b><br>
+</p>
+
+<p><i>Powyższa wiadomość została wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</i></p>
+</body>
+</html>
