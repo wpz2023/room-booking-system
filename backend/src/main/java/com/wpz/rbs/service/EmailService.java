@@ -61,7 +61,7 @@ public class EmailService {
 
     public void sendDeclinedMessageToUser(Reservation reservation) {
         Room room = roomService.getById(reservation.getRoom_id());
-        String subject = "[System rezerwacji sal] Informacje o rezerwacji #" + reservation.getId() + " \"" + reservation.getName().toLowerCase() + "\"";
+        String subject = "[System rezerwacji sal] Odrzucenie rezerwacji #" + reservation.getId() + " - " + reservation.getName().toLowerCase();
 
         Map<String, Object> model = new HashMap<>();
         model.put("reservation_name", reservation.getName());
@@ -73,6 +73,27 @@ public class EmailService {
         thymeleafContext.setVariables(model);
 
         String htmlBody = thymeleafTemplateEngine.process("user-decline-message.html", thymeleafContext);
+        try {
+            sendHtmlMessage(reservation.getEmail(), subject, htmlBody);
+        } catch (MessagingException e) {
+            System.err.println("Email was not send successfully");
+        }
+    }
+
+    public void sendAcceptedMessageToUser(Reservation reservation) {
+        Room room = roomService.getById(reservation.getRoom_id());
+        String subject = "[System rezerwacji sal] Akceptacja rezerwacji #" + reservation.getId() + " - " + reservation.getName().toLowerCase();
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("reservation_name", reservation.getName());
+        model.put("room_number", room.getNumber());
+        model.put("start_time", reservation.getStart_time());
+        model.put("end_time", reservation.getEnd_time());
+
+        Context thymeleafContext = new Context();
+        thymeleafContext.setVariables(model);
+
+        String htmlBody = thymeleafTemplateEngine.process("user-accept-message.html", thymeleafContext);
         try {
             sendHtmlMessage(reservation.getEmail(), subject, htmlBody);
         } catch (MessagingException e) {
