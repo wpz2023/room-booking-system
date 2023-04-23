@@ -4,10 +4,7 @@ import com.wpz.rbs.model.Activity;
 import com.wpz.rbs.model.ActivityConflict;
 import com.wpz.rbs.service.ActivityService;
 import jakarta.validation.constraints.NotEmpty;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
@@ -38,7 +35,12 @@ public class ActivityController {
     }
 
     @GetMapping("room/{id}/conflicts")
-    private List<ActivityConflict> getConflictsByRoomId(@PathVariable("id") int roomId) throws ParseException {
+    private ActivityConflict getConflictsByRoomId(@PathVariable("id") int roomId) throws ParseException {
         return activityService.getConflictsRoom(roomId);
+    }
+
+    @PostMapping("room/{id}/conflicts")
+    private ActivityConflict getConflictsByRoomId(@PathVariable("id") int roomId, @RequestBody List<String> request) throws ParseException {
+        return activityService.resolveConflictsRoom(roomId, request);
     }
 }

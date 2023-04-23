@@ -55,7 +55,7 @@ public class ReservationService {
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
-        return activityRepository.findAllByRoom_Id(roomId).stream().anyMatch(a -> {
+        return activityRepository.findAllByRoomId(roomId).stream().anyMatch(a -> {
             try {
                 Date startDate = StaticHelpers.parseDateTime(a.getStart_time());
                 Date endDate = StaticHelpers.parseDateTime(a.getEnd_time());
