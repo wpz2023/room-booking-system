@@ -9,5 +9,11 @@ import java.util.List;
 public interface ActivityRepository extends CrudRepository<Activity, String> {
 
     @Query(value = "select * from Activity a where a.room_id = :roomId", nativeQuery = true)
-    List<Activity> findAllByRoom_Id(int roomId);
+    List<Activity> findAllByRoomId(int roomId);
+
+    @Query(value = "select * from Activity a where a.room_id = :roomId and a.is_usos = true", nativeQuery = true)
+    List<Activity> findAllUsosActivitiesByRoomId(int roomId);
+
+    @Query(value = "select * from Activity a where a.room_id = :roomId and a.is_usos = false", nativeQuery = true)
+    List<Activity> findAllUserActivitiesByRoomId(int roomId);
 }

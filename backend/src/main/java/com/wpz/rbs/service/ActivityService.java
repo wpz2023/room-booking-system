@@ -27,13 +27,13 @@ public class ActivityService {
     }
 
     public List<Activity> getByRoomId(int roomId) {
-        return new ArrayList<>(activityRepository.findAllByRoom_Id(roomId));
+        return new ArrayList<>(activityRepository.findAllByRoomId(roomId));
     }
 
     public List<Activity> getByRoomIdForNextWeek(int roomId, String startDateString) throws ParseException {
         Date startDate = StaticHelpers.parseDate(startDateString);
         Date endDate = StaticHelpers.addDays(startDate, 6);
-        return activityRepository.findAllByRoom_Id(roomId).stream().filter(a -> {
+        return activityRepository.findAllByRoomId(roomId).stream().filter(a -> {
             try {
                 Date date = StaticHelpers.parseDate(a.getStart_time());
                 return !(date.before(startDate) || date.after(endDate));
@@ -44,10 +44,10 @@ public class ActivityService {
     }
 
     public void clearUsosFromTo(int roomId, Date startDate, Date endDate) {
-        activityRepository.findAllByRoom_Id(roomId).forEach(activity -> {
+        activityRepository.findAllByRoomId(roomId).forEach(activity -> {
             if (!activity.getIs_usos()) return;
 
-            Date date = new Date();
+            Date date;
             try {
                 date = StaticHelpers.parseDate(activity.getStart_time());
             } catch (ParseException e) {
@@ -64,38 +64,41 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public List<ActivityConflict> getConflictsRoom(int roomId) throws ParseException {
-        var activities = activityRepository.findAllByRoom_Id(roomId);
+    public ActivityConflict getConflictsRoom(int roomId) throws ParseException {
+        List<Activity> userActivities = activityRepository.findAllUserActivitiesByRoomId(roomId);
 
-        var conflicts = new ArrayList<ActivityConflict>();
+        if (userActivities.isEmpty()) {
+            return null;
+        }
 
-        for (var i = 0; i < activities.size(); ++i) {
-            var activity1 = activities.get(i);
-            for (var j = i + 1; j < activities.size(); ++j) {
-                var activity2 = activities.get(j);
+        List<Activity> usosActivities = activityRepository.findAllUsosActivitiesByRoomId(roomId);
 
-                if (activity1.getIs_usos() && activity2.getIs_usos())
-                    continue;
+        if (usosActivities.isEmpty()) {
+            return null;
+        }
 
+        List<String> usosConflictsIds = new ArrayList<>();
 
-                if (StaticHelpers.activitiesOverlapping(
-                        StaticHelpers.parseDateTime(activity1.getStart_time()),
-                        StaticHelpers.parseDateTime(activity1.getEnd_time()),
-                        StaticHelpers.parseDateTime(activity2.getStart_time()),
-                        StaticHelpers.parseDateTime(activity2.getEnd_time()))) {
-                    conflicts.add(new ActivityConflict(activity1.getId(), activity2.getId()));
+        for (Activity userActivity : userActivities) {
+            for (Activity usosActivity : usosActivities) {
+                Date userActivityStartTime = StaticHelpers.parseDateTime(userActivity.getStart_time());
+                Date userActivityEndTime = StaticHelpers.parseDateTime(userActivity.getEnd_time());
+                Date usosActivityStartTime = StaticHelpers.parseDateTime(usosActivity.getStart_time());
+                Date usosActivityEndTime = StaticHelpers.parseDateTime(usosActivity.getEnd_time());
+
+                if (StaticHelpers.activitiesOverlapping(userActivityStartTime, userActivityEndTime, usosActivityStartTime, usosActivityEndTime)) {
+                    usosConflictsIds.add(usosActivity.getId());
                 }
+            }
+            if (!usosConflictsIds.isEmpty()) {
+                return new ActivityConflict(usosConflictsIds, userActivity.getId());
             }
         }
 
-        return conflicts;
-    }
-
-    public ActivityConflict getConflictsRoom(int roomId) {
         return null;
     }
 
-    public ActivityConflict resolveConflictsRoom(int roomId, List<String> activitiesId) {
+    public ActivityConflict resolveConflictsRoom(int roomId, List<String> activitiesId) throws ParseException {
         activityRepository.deleteAllById(activitiesId);
         return getConflictsRoom(roomId);
     }
