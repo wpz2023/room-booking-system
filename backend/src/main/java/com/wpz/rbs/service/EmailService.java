@@ -2,6 +2,7 @@ package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Reservation;
 import com.wpz.rbs.model.Room;
+import com.wpz.rbs.utils.PropertiesUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +20,6 @@ public class EmailService {
 
     @Value("${spring.mail.username}")
     private String from;
-
-    @Value("${email}")
-    private String adminEmail;
 
     private final JavaMailSender emailSender;
     private final SpringTemplateEngine thymeleafTemplateEngine;
@@ -53,7 +51,7 @@ public class EmailService {
 
         String htmlBody = thymeleafTemplateEngine.process("admin-message.html", thymeleafContext);
         try {
-            sendHtmlMessage(adminEmail, subject, htmlBody);
+            sendHtmlMessage(PropertiesUtils.getAdminEmail(), subject, htmlBody);
         } catch (MessagingException e) {
             System.err.println("Email was not send successfully");
         }

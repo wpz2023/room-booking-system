@@ -1,6 +1,6 @@
 package com.wpz.rbs.model;
 
-import lombok.AllArgsConstructor;
+import com.wpz.rbs.utils.PropertiesUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +14,7 @@ import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class User implements UserDetails {
-
-    private String email;
-    private String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -27,12 +23,12 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return PropertiesUtils.getAdminEmail();
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return PropertiesUtils.getAdminPassword();
     }
 
     @Override
