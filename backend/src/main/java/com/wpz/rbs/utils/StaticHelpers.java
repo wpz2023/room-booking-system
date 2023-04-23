@@ -1,5 +1,7 @@
 package com.wpz.rbs.utils;
 
+import com.wpz.rbs.model.Activity;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,7 +19,7 @@ public class StaticHelpers {
         return dateFormat.parse(date);
     }
 
-    public static String dateToString(Date date) throws ParseException {
+    public static String dateToString(Date date) {
         return dateFormat.format(date);
     }
 
@@ -32,16 +34,16 @@ public class StaticHelpers {
         return c.getTime();
     }
 
-    public static Date getPreviousOctober(Date date){
+    public static Date getPreviousOctober(Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
 
-        if(c.get(Calendar.MONTH) < Calendar.OCTOBER){
+        if (c.get(Calendar.MONTH) < Calendar.OCTOBER) {
             c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 1);
         }
         c.set(Calendar.MONTH, Calendar.OCTOBER);
         c.set(Calendar.DAY_OF_MONTH, 1);
-        
+
         return c.getTime();
     }
 
@@ -49,5 +51,13 @@ public class StaticHelpers {
         boolean condition1 = endDate1.compareTo(startDate2) <= 0;
         boolean condition2 = startDate1.compareTo(endDate2) >= 0;
         return !(condition1 || condition2);
+    }
+
+    public static boolean activitiesOverlapping(Activity firstActivity, Activity secondActivity) throws ParseException {
+        Date firstActivityStartTime = parseDateTime(firstActivity.getStart_time());
+        Date firstActivityEndTime = parseDateTime(firstActivity.getEnd_time());
+        Date secondActivityStartTime = parseDateTime(secondActivity.getStart_time());
+        Date secondActivityEndTime = parseDateTime(secondActivity.getEnd_time());
+        return activitiesOverlapping(firstActivityStartTime, firstActivityEndTime, secondActivityStartTime, secondActivityEndTime);
     }
 }

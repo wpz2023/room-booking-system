@@ -81,12 +81,7 @@ public class ActivityService {
 
         for (Activity userActivity : userActivities) {
             for (Activity usosActivity : usosActivities) {
-                Date userActivityStartTime = StaticHelpers.parseDateTime(userActivity.getStart_time());
-                Date userActivityEndTime = StaticHelpers.parseDateTime(userActivity.getEnd_time());
-                Date usosActivityStartTime = StaticHelpers.parseDateTime(usosActivity.getStart_time());
-                Date usosActivityEndTime = StaticHelpers.parseDateTime(usosActivity.getEnd_time());
-
-                if (StaticHelpers.activitiesOverlapping(userActivityStartTime, userActivityEndTime, usosActivityStartTime, usosActivityEndTime)) {
+                if (StaticHelpers.activitiesOverlapping(userActivity, usosActivity)) {
                     usosConflictsIds.add(usosActivity.getId());
                 }
             }
