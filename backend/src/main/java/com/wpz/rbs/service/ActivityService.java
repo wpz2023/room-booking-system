@@ -90,4 +90,13 @@ public class ActivityService {
 
         return conflicts;
     }
+
+    public ActivityConflict getConflictsRoom(int roomId) {
+        return null;
+    }
+
+    public ActivityConflict resolveConflictsRoom(int roomId, List<String> activitiesId) {
+        activityRepository.deleteAllById(activitiesId);
+        return getConflictsRoom(roomId);
+    }
 }
