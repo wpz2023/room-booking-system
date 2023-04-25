@@ -148,7 +148,7 @@ function Room() {
                         ) : (
                             <div className="mb-2">
                                 <label className=" text-lg font-bold">Rodzaj:
-                                    <select value={Object.entries(RoomAnnotation).find(([ val]) => val === roomAnnotation)?.[0]} onChange={roomAnnotationChange}
+                                    <select value={Object.entries(RoomAnnotation).find(([key, val]) => val === roomAnnotation)?.[0]} onChange={roomAnnotationChange}
                                             className="ml-1  font-normal text-center px-1 border-b-2 border-blue-500
                                     hover:border-2 hover:border-blue-500 hover:rounded-md  focus:border-2
                                     focus:border-blue-500 focus:rounded-md outline-none ">
