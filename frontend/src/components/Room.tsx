@@ -1,7 +1,7 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
-import { useQuery } from "@tanstack/react-query";
-import {RoomData} from "../models/Room";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {RoomAnnotation, RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
 import 'moment/locale/pl';
@@ -9,8 +9,17 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NewCalendar from "./Calendar";
 
 
+
+
 function Room() {
     const {id} = useParams();
+    const [roomAnnotation, setRoomAnnotation ] = useState()
+    let token = window.sessionStorage.getItem("jwtToken");
+
+    useEffect(() => {
+        token = window.sessionStorage.getItem("jwtToken");
+        refetchRoom()
+    }, [token]);
 
     const getRoomInfo = () => {
         return Api.Api.get(`room/${id}`).then((res) => res.data);
@@ -24,10 +33,17 @@ function Room() {
     } = useQuery<RoomData>(["room_info"], getRoomInfo, {
         refetchOnWindowFocus: false,
         enabled: true,
-        
     });
 
-    const getRoomActivities =  () => {
+    useEffect( () => {
+        if (room?.roomAnnotation===null){
+            setRoomAnnotation("")
+        } else {
+            setRoomAnnotation(room?.roomAnnotation)
+        }
+    }, [room])
+
+    const getRoomActivities = () => {
         return  Api.Api.get(`activity/room/${id}`).then((res) => res.data);
     }
 
@@ -93,6 +109,23 @@ function Room() {
         text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
     } ));
 
+    const pushNewRoomAnnotation = useMutation((newAnnotation) => {
+        const roomData = {
+            "roomAnnotation": newAnnotation
+        }
+
+        return Api.authApi.patch(`room/update/${id}`,roomData,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+    })
+
+    const roomAnnotationChange = (e) => {
+        e.preventDefault();
+        pushNewRoomAnnotation.mutate(RoomAnnotation[e.target.value as keyof typeof RoomAnnotation]) // e.target.value)
+        setRoomAnnotation(e.target.value)
+    }
 
     return (
         <div className=" mx-16 py-10">
@@ -101,13 +134,28 @@ function Room() {
                 {isRoomFetching ? (
                     <p className="text-center">Ładowanie danych...</p>
                 ) : (
-                    <div className="w-52 text-start">
+                    <div className="w-60 text-start">
                         <p className="pb-4 text-4xl text-center font-bold">{room?.number}</p>
 
-                        <p className="mb-2 text-lg">
-                            <span className="font-bold">Rodzaj: </span>
-                            {room?.annotation}
-                        </p>
+                        {!token ? (
+                            <p className="mb-2 text-lg">
+                                <span className="font-bold">Rodzaj: </span>
+                                {room?.roomAnnotation}
+                            </p>
+                        ) : (
+                            <div className="mb-2">
+                                <label className=" text-lg font-bold">Rodzaj:
+                                    <select value={Object.entries(RoomAnnotation).find(([key, val]) => val === roomAnnotation)?.[0]} onChange={roomAnnotationChange}
+                                            className="ml-1  font-normal text-center px-1 border-b-2 border-blue-500
+                                    hover:border-2 hover:border-blue-500 hover:rounded-md  focus:border-2
+                                    focus:border-blue-500 focus:rounded-md outline-none ">
+                                        {Object.keys(RoomAnnotation).map(key =>
+                                            <option value={key}>{RoomAnnotation[key]}</option>
+                                        )}
+                                    </select>
+                                </label>
+                            </div>
+                        )}
 
                         <p className="mb-2 text-lg">
                             <span className="font-bold">Pojemność: </span>
