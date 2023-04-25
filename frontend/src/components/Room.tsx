@@ -13,6 +13,7 @@ import NewCalendar from "./Calendar";
 
 function Room() {
     const {id} = useParams();
+    const [roomAnnotation, setRoomAnnotation ] = useState()
     let token = window.sessionStorage.getItem("jwtToken");
 
     useEffect(() => {
@@ -34,15 +35,12 @@ function Room() {
         enabled: true,
     });
 
-    const [roomAnnotation, setRoomAnnotation ] = useState(room?.roomAnnotation===null ? "" : String(room?.roomAnnotation))
-
     useEffect( () => {
         if (room?.roomAnnotation===null){
             setRoomAnnotation("")
         } else {
             setRoomAnnotation(room?.roomAnnotation)
         }
-        console.log(roomAnnotation + " - " + room?.roomAnnotation)
     }, [room])
 
     const getRoomActivities = () => {
@@ -128,7 +126,6 @@ function Room() {
         pushNewRoomAnnotation.mutate(RoomAnnotation[e.target.value as keyof typeof RoomAnnotation]) // e.target.value)
         setRoomAnnotation(e.target.value)
     }
-
 
     return (
         <div className=" mx-16 py-10">
