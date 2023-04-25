@@ -6,5 +6,13 @@ export interface Room{
 export interface RoomData extends Room{
     type: string;
     capacity: number;
-    roomAnnotation: string;
+    roomAnnotation: RoomAnnotation;
+}
+
+export enum RoomAnnotation {
+    LAB = "laboratoryjna",
+    LECTURE = "wykładowa",
+    EXERCISE = "ćwiczeniowa",
+    COMPUTER = "komputerowa",
+    EMPTY = ""
 }
