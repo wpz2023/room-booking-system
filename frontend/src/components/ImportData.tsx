@@ -1,7 +1,13 @@
 import React, {useEffect, useState} from "react";
-import { RoomData } from "../models/Room";
+import {RoomData} from "../models/Room";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import Api from "../Api";
+import ConflictPopUp from "./ConflictPopUp";
+import {Activity} from "../models/Activity";
+import {Conflict} from "../models/Conflict";
+
+
+
 
 function ImportData() {
   const token = window.sessionStorage.getItem("jwtToken");
@@ -33,21 +39,45 @@ function ImportData() {
 
 
 
+  const [activitiesToDelete, setActivitiesToDelete] = useState([])
+
+
+  const {
+      mutate,
+      data: roomConflict,
+      isLoading: loadingConflicts,
+      error } = useMutation<Conflict>( async (id) => {
+          const response =  await Api.authApi.post(`activity/room/${id}/conflicts`, activitiesToDelete, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+          return response.data
+      },
+      {
+          onSuccess: (responseData) => {
+              if (responseData){
+                  console.log("MAM")
+                  console.log(responseData.userActivity)
+                  setPopupVisible(true)
+              }
+          }
+      });
+
 
   const [roomId, setRoomId] = useState(0);
+  const [roomName, setRoomName] = useState("");
 
-  const getRoomActivities = () => {
+  const getRoomActivities = async () => {
       if (roomId != 0){
-          console.log("-- getRoomActivities --")
-          console.log("id: " + roomId)
-
-          return Api.authApi
+          return await Api.authApi
               .get(`import/activity/${roomId}`, {
                   headers: {
                       Authorization: `Bearer ${token}`,
                   },
               })
-              .then((res) => res.data);
+              .then((res) => res.data)
+              .finally(async() => await mutate(roomId));
       }
       return null
   }
@@ -63,6 +93,7 @@ function ImportData() {
 
   const onButtonClick = (e) => {
       setRoomId(e.target.value)
+
   }
 
 
@@ -71,6 +102,7 @@ function ImportData() {
   }, [roomId])
 
 
+  const [popupVisible, setPopupVisible] = useState(false)
 
 
   return (
@@ -90,12 +122,12 @@ function ImportData() {
       ) : (
         <div>
           {data && (
-            <div className="w-[450px] px-6">
+            <div className="w-[650px] px-6">
               <p className="font-medium">Numer sali</p>
               <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
             </div>
           )}
-          <ul role="list" className="w-[450px] p-6 divide-y divide-slate-200">
+          <ul role="list" className="w-full p-6 divide-y divide-slate-200">
             {data?.map((room) => (
               <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                 <div className="flex text-center items-center">
@@ -115,6 +147,8 @@ function ImportData() {
               </li>
             ))}
           </ul>
+            {popupVisible &&
+                <ConflictPopUp conflict={roomConflict} roomName={roomName} />}
         </div>
       )}
     </div>
