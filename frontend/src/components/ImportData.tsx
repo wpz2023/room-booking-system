@@ -59,6 +59,8 @@ function ImportData() {
               if (responseData){
                   console.log("MAM")
                   console.log(responseData.userActivity)
+                  console.log(roomId)
+                  console.log(roomName)
                   setPopupVisible(true)
               }
           }
@@ -92,14 +94,14 @@ function ImportData() {
 
 
   const onButtonClick = (e) => {
-      setRoomId(e.target.value)
-
+      setRoomId(e.target.dataset.value1)
+      setRoomName(e.target.dataset.value2)
   }
 
 
   useEffect( () => {
       refetchRoomActivities()
-  }, [roomId])
+  }, [roomName])
 
 
   const [popupVisible, setPopupVisible] = useState(false)
@@ -133,7 +135,7 @@ function ImportData() {
                 <div className="flex text-center items-center">
                   <p className="basis-3/5 font-medium">{room.number}</p>
                   <div>
-                      <button value={room.id} onClick={onButtonClick} disabled={isActivitiesFetching}
+                      <button data-value1={room.id} data-value2={room.number} onClick={onButtonClick} disabled={isActivitiesFetching}
                               style={{cursor: isActivitiesFetching ? 'wait' : 'pointer'}}
                               className="basis-2/5  px-8 py-2  transition hover:scale-110 delay-150 rounded-lg
                                     bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
@@ -147,8 +149,8 @@ function ImportData() {
               </li>
             ))}
           </ul>
-            {popupVisible &&
-                <ConflictPopUp conflict={roomConflict} roomName={roomName} />}
+            {popupVisible && roomName &&
+                <ConflictPopUp conflict={roomConflict} onClose={() => setPopupVisible(false)} popupVisible={popupVisible}  />}
         </div>
       )}
     </div>
