@@ -10,6 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityConflict {
-    private List<String> usosActivities;
-    private String userActivity;
+    private List<Activity> usosActivities;
+    private Activity userActivity;
 }

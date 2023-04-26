@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import { RoomData } from "../models/Room";
-import { useQuery } from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import Api from "../Api";
 
 function ImportData() {
@@ -20,6 +20,7 @@ function ImportData() {
     refetch();
   };
 
+
   const { isFetching, data, refetch } = useQuery<RoomData[]>(
     ["data"],
     getImportRooms,
@@ -29,8 +30,51 @@ function ImportData() {
     }
   );
 
+
+
+
+
+  const [roomId, setRoomId] = useState(0);
+
+  const getRoomActivities = () => {
+      if (roomId != 0){
+          console.log("-- getRoomActivities --")
+          console.log("id: " + roomId)
+
+          return Api.authApi
+              .get(`import/activity/${roomId}`, {
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              })
+              .then((res) => res.data);
+      }
+      return null
+  }
+
+  const {
+      isFetching: isActivitiesFetching,
+      refetch: refetchRoomActivities
+  } = useQuery(["roomActivities"], getRoomActivities, {
+      refetchOnWindowFocus: false,
+      enabled: false,
+  });
+
+
+  const onButtonClick = (e) => {
+      setRoomId(e.target.value)
+  }
+
+
+  useEffect( () => {
+      refetchRoomActivities()
+  }, [roomId])
+
+
+
+
   return (
-    <div className="flex flex-col items-center pt-20 pb-6">
+    <div className="flex flex-col items-center pt-20 pb-6" >
       <div className="w-2/5 pb-14 text-center text-2xl font-medium">
         <p>Import danych</p>
       </div>
@@ -56,12 +100,17 @@ function ImportData() {
               <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                 <div className="flex text-center items-center">
                   <p className="basis-3/5 font-medium">{room.number}</p>
-                  <button
-                    className="basis-2/5  px-8 py-2  transition hover:scale-110 delay-150 rounded-lg
-        bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"
-                  >
-                    Importuj plan
-                  </button>
+                  <div>
+                      <button value={room.id} onClick={onButtonClick} disabled={isActivitiesFetching}
+                              style={{cursor: isActivitiesFetching ? 'wait' : 'pointer'}}
+                              className="basis-2/5  px-8 py-2  transition hover:scale-110 delay-150 rounded-lg
+                                    bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
+                          Importuj plan
+                      </button>
+                      {isActivitiesFetching && roomId==room.id && (
+                          <p className="pt-2 font-normal">Importowanie planu</p>
+                      )}
+                  </div>
                 </div>
               </li>
             ))}
