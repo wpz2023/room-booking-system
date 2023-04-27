@@ -1,24 +1,22 @@
 import React, {useEffect, useState} from "react";
 import {Conflict} from "../models/Conflict";
-import {tr} from "date-fns/locale";
+
 
 function ConflictPopUp(
-    {conflict} : {conflict: Conflict},
-    {onClose}: {onClose: () => void},
-    {popupVisible}: {popupVisible: boolean}
-    // {onClick}: {onClick: () => void},
-    // {roomName}: {roomName: string}
+    {conflict, onClose, deleteActivities}
 ){
 
-    if(!popupVisible){
-        return null;
-    }
-
-
     const [activitiesToDelete, setActivitiesToDelete] = useState([])
+    useEffect(() => {
+        if (activitiesToDelete.length > 0){
+            console.log("to delete: " + activitiesToDelete)
+            onClose();
+            deleteActivities(activitiesToDelete)
+        }
+    }, [activitiesToDelete])
 
     const deleteUsosActivities = () => {
-        const activities: String[] = []
+        const activities: string[] = []
 
         conflict.usosActivities.map((activity) => {
             activities.push(activity.id)
@@ -30,12 +28,6 @@ function ConflictPopUp(
     const deleteUserActivity = () => {
         setActivitiesToDelete(conflict.userActivity.id)
     }
-
-    useEffect(() => {
-        console.log("to delete: " + activitiesToDelete)
-        onClose();
-    }, [activitiesToDelete])
-
 
    return (
        <div className="fixed inset-0 z-50 flex items-center justify-center">
