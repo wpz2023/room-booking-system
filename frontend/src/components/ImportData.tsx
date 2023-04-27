@@ -9,7 +9,7 @@ import {Conflict} from "../models/Conflict";
 function ImportData() {
     const token = window.sessionStorage.getItem("jwtToken");
     const [popupVisible, setPopupVisible] = useState<boolean>(false)
-    const [activitiesToDelete, setActivitiesToDelete] = useState([])
+    const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([])
     const [roomId, setRoomId] = useState(0);
     const [roomName, setRoomName] = useState("");
 
@@ -27,10 +27,6 @@ function ImportData() {
         {
             onSuccess: (responseData) => {
                 if (responseData) {
-                    console.log("MAM")
-                    console.log(responseData.userActivity)
-                    console.log(roomId)
-                    console.log(roomName)
                     setPopupVisible(true)
                 }
             }
@@ -92,8 +88,7 @@ function ImportData() {
 
 
     const deleteActivities = (activities: string[]) => {
-        console.log("mam wartość: " + activities)
-        setActivitiesToDelete([activities])
+        setActivitiesToDelete(activities)
     }
 
     useEffect(  () => {
@@ -146,7 +141,8 @@ function ImportData() {
                         ))}
                     </ul>
                     {popupVisible &&
-                        <ConflictPopUp conflict={roomConflict} onClose={() => setPopupVisible(false)} deleteActivities={deleteActivities}/>}
+                        <ConflictPopUp conflict={roomConflict} onClose={() => setPopupVisible(false)}
+                                       deleteActivities={deleteActivities}/>}
                 </div>
             )}
         </div>

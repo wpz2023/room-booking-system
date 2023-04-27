@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {Conflict} from "../models/Conflict";
 
 
 function ConflictPopUp(
@@ -9,7 +8,6 @@ function ConflictPopUp(
     const [activitiesToDelete, setActivitiesToDelete] = useState([])
     useEffect(() => {
         if (activitiesToDelete.length > 0){
-            console.log("to delete: " + activitiesToDelete)
             onClose();
             deleteActivities(activitiesToDelete)
         }
@@ -26,7 +24,7 @@ function ConflictPopUp(
     }
 
     const deleteUserActivity = () => {
-        setActivitiesToDelete(conflict.userActivity.id)
+        setActivitiesToDelete([conflict.userActivity.id])
     }
 
    return (
@@ -62,7 +60,6 @@ function ConflictPopUp(
                            ))}
                        </ul>
                    </div>
-
 
                    <div className="basis-1/2 px-2">
                        <p className="mb-1">
