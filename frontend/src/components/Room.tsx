@@ -7,7 +7,7 @@ import {Activity} from "../models/Activity";
 import 'moment/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NewCalendar from "./Calendar";
-
+import {Views} from "react-big-calendar";
 
 
 
@@ -107,6 +107,7 @@ function Room() {
         group_number: activity.group_number,
         lecturers: activity.lecturers,
         text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
+        is_usos: activity.is_usos
     } ));
 
     const pushNewRoomAnnotation = useMutation((newAnnotation) => {
@@ -173,7 +174,10 @@ function Room() {
                         <div className="flex flex-col my-8">
                             <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                             <div>
-                                <NewCalendar activities={roomActivities}/>
+                                <NewCalendar activities={roomActivities} defaultView={Views.WEEK} views={[Views.WEEK]}
+                                             minDate={new Date(0, 0, 0, 6, 0, 0)}
+                                             maxDate={new Date(0, 0, 0, 22, 0, 0)}
+                                             toolbar={true} step={15}/>
                             </div>
                             <div>
                                 <p>tutaj dodanie rezerwacji</p>

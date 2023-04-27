@@ -1,11 +1,11 @@
-import {Calendar, dateFnsLocalizer, Views} from "react-big-calendar";
+import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import React, {useEffect, useRef} from "react";
 import {pl} from "date-fns/locale";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import {Lecturer} from "../models/Lecturer";
+import {EventData} from "../models/Activity";
 
 
 interface EventProps {
@@ -13,15 +13,6 @@ interface EventProps {
     children?: React.ReactNode;
 }
 
-interface EventData {
-    start: Date;
-    end: Date;
-    course_name: Map<string, string>;
-    classtype_name: Map<string, string>;
-    group_number: number;
-    lecturers: Set<Lecturer>;
-    text: string;
-}
 
 
 const Event: React.FC<EventProps> = ({ event, children }) => {
@@ -59,7 +50,7 @@ const Event: React.FC<EventProps> = ({ event, children }) => {
 
 
 function NewCalendar(
-    {activities}: { activities: EventData[]}
+    {activities, defaultView, views, minDate, maxDate, toolbar, date, step, eventPropGetter}
 ) {
 
     // dane do wyświetlenia po najechaniu kursorem na event w kalendarzu
@@ -82,19 +73,23 @@ function NewCalendar(
             culture={"pl"}
             localizer={localizer}
             events={activities}
-            defaultView={Views.WEEK}
-            views={[Views.WEEK]}
+            defaultView={defaultView}
+            views={views}
             components={{
                 event: Event
             }}
-            step={15}
+            step={step}
+            selectable={false}
+            toolbar={toolbar}
+            date={date}
             tooltipAccessor={tooltipAccessor}
             dayLayoutAlgorithm="no-overlap"
+            eventPropGetter={eventPropGetter}
             startAccessor="start"
             endAccessor="end"
             style={{height: 'full'}}
-            min={new Date(0, 0, 0, 6, 0, 0)}
-            max={new Date(0, 0, 0, 22, 0, 0)}
+            min={minDate}
+            max={maxDate}
             messages={{
                 allDay: 'Cały dzień',
                 previous: 'Poprzedni',

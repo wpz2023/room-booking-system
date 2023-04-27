@@ -13,9 +13,7 @@ function ImportData() {
     const [roomId, setRoomId] = useState(0);
     const [roomName, setRoomName] = useState("");
 
-
     const {mutate, data: roomConflict} = useMutation<Conflict>(async (id) => {
-            console.log("Wysyłam na room: " + roomId + " rzeczy: " + activitiesToDelete)
             const response = await Api.authApi.post(`activity/room/${id}/conflicts`, activitiesToDelete, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -86,7 +84,6 @@ function ImportData() {
         setRoomName(e.target.dataset.value2)
     }
 
-
     const deleteActivities = (activities: string[]) => {
         setActivitiesToDelete(activities)
     }
@@ -114,7 +111,7 @@ function ImportData() {
             ) : (
                 <div>
                     {data && (
-                        <div className="w-[650px] px-6">
+                        <div className="w-[450px] px-6">
                             <p className="font-medium">Numer sali</p>
                             <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                         </div>
@@ -142,7 +139,7 @@ function ImportData() {
                     </ul>
                     {popupVisible &&
                         <ConflictPopUp conflict={roomConflict} onClose={() => setPopupVisible(false)}
-                                       deleteActivities={deleteActivities}/>}
+                                       deleteActivities={deleteActivities} roomName={roomName}/>}
                 </div>
             )}
         </div>
