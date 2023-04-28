@@ -5,13 +5,24 @@ import Api from "../Api";
 import ConflictPopUp from "./ConflictPopUp";
 import {Conflict} from "../models/Conflict";
 
+interface RoomData {
+    id: Number,
+    name: string
+}
 
 function ImportData() {
     const token = window.sessionStorage.getItem("jwtToken");
     const [popupVisible, setPopupVisible] = useState<boolean>(false)
     const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([])
-    const [roomId, setRoomId] = useState(0);
+    // const [room, setRoomId] = useState<RoomData>({id:0, name:""});
     const [roomName, setRoomName] = useState("");
+    const [roomId, setRoomId] = useState(0)
+
+    useEffect(() => {
+        if (activitiesToDelete.length > 0) {
+            mutate(roomId)
+        }
+    }, [activitiesToDelete])
 
     const {mutate, data: roomConflict} = useMutation<Conflict>(async (id) => {
             const response = await Api.authApi.post(`activity/room/${id}/conflicts`, activitiesToDelete, {
@@ -52,9 +63,6 @@ function ImportData() {
         enabled: false,
     });
 
-    useEffect(() => {
-        refetchRoomActivities()
-    }, [roomName])
 
     const getImportRooms = () => {
         return Api.authApi
@@ -88,12 +96,9 @@ function ImportData() {
         setActivitiesToDelete(activities)
     }
 
-    useEffect(  () => {
-        if (activitiesToDelete.length > 0){
-            mutate(roomId)
-        }
-    }, [activitiesToDelete])
-
+    useEffect(() => {
+        refetchRoomActivities()
+    }, [roomId])
 
     return (
         <div className="flex flex-col items-center pt-20 pb-6">

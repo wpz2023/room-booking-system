@@ -10,12 +10,10 @@ import {EventData} from "../models/Activity";
 
 interface EventProps {
     event: EventData;
-    children?: React.ReactNode;
 }
 
 
-
-const Event: React.FC<EventProps> = ({ event, children }) => {
+const Event: React.FC<EventProps> = ({ event }) => {
     const eventRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -43,7 +41,6 @@ const Event: React.FC<EventProps> = ({ event, children }) => {
             { Array.from(event.lecturers).map((lecturer) => (
                 <p>{lecturer.first_name} {lecturer.last_name}</p>
             ))}
-            {children}
         </div>
     );
 };

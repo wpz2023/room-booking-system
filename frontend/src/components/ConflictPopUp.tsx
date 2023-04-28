@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import NewCalendar from "./Calendar";
 import {EventPropGetter, Views} from "react-big-calendar";
 import {EventData} from "../models/Activity";
+import {mapActivitiesToEvents} from "../utils/MapActivitiesToEvents";
 
 const eventPropGetter: EventPropGetter<EventData> = (event: EventData) => {
     let backgroundColor = '#3174ad'
@@ -24,6 +25,7 @@ function ConflictPopUp(
     const day = Number(conflict.userActivity.start_time.substring(8,10))
     let minH = Number(conflict.userActivity.start_time.substring(11,13))
     let maxH = Number(conflict.userActivity.end_time.substring(11,13))
+    const conflictActivities = mapActivitiesToEvents(conflict.usosActivities)
 
     useEffect(() => {
         if (activitiesToDelete.length > 0){
@@ -32,72 +34,7 @@ function ConflictPopUp(
         }
     }, [activitiesToDelete])
 
-    const changeClasstypeName = (classType: Map<string, string>) => {
-        if (classType["pl"]=="Wykład"){
-            classType["pl"] = "WYK"
-        } else if (classType["pl"]=="Ćwiczenia"){
-            classType["pl"] =  "CW"
-        } else if (classType["pl"]=="Konwersatorium"){
-            classType["pl"] = "KON"
-        } else if (classType["pl"]=="Laboratorium"){
-            classType["pl"] = "LAB"
-        } else if (classType["pl"]=="Seminarium"){
-            classType["pl"] = "SEM"
-        } else if (classType["pl"]=="Pracownia"){
-            classType["pl"] = "PRA"
-        } else if (classType["pl"]=="Pracownia komputerowa"){
-            classType["pl"] = "PKO"
-        } else if (classType["pl"]=="Lektorat"){
-            classType["pl"] = "LEK"
-        } else if (classType["pl"]=="Warsztat"){
-            classType["pl"] = "WAR"
-        }
-        return classType;
-    }
-
-    const conflictActivities = conflict.usosActivities.map(activity => ({
-        ...activity,
-        start: new Date(Number(activity.start_time.substring(0,4)), //year
-            Number(activity.start_time.substring(5,7))-1, // month
-            Number(activity.start_time.substring(8,10)), // day
-            Number(activity.start_time.substring(11,13)), // hour
-            Number(activity.start_time.substring(14,16)), // minute
-        ),
-        end: new Date(Number(activity.end_time.substring(0,4)), //year
-            Number(activity.end_time.substring(5,7))-1, // month
-            Number(activity.end_time.substring(8,10)), // day
-            Number(activity.end_time.substring(11,13)), // hour
-            Number(activity.end_time.substring(14,16)), // minute
-        ),
-        course_name: activity.course_name,
-        classtype_name: changeClasstypeName(activity.classtype_name),
-        group_number: activity.group_number,
-        lecturers: activity.lecturers,
-        text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
-        is_usos: activity.is_usos
-    }));
-
-    conflictActivities.push({
-        start: new Date(Number(conflict.userActivity.start_time.substring(0,4)), //year
-            Number(conflict.userActivity.start_time.substring(5,7))-1, // month
-            Number(conflict.userActivity.start_time.substring(8,10)), // day
-            Number(conflict.userActivity.start_time.substring(11,13)), // hour
-            Number(conflict.userActivity.start_time.substring(14,16)), // minute
-        ),
-        end: new Date(Number(conflict.userActivity.end_time.substring(0,4)), //year
-            Number(conflict.userActivity.end_time.substring(5,7))-1, // month
-            Number(conflict.userActivity.end_time.substring(8,10)), // day
-            Number(conflict.userActivity.end_time.substring(11,13)), // hour
-            Number(conflict.userActivity.end_time.substring(14,16)), // minute
-        ),
-        course_name: conflict.userActivity.course_name,
-        classtype_name: changeClasstypeName(conflict.userActivity.classtype_name),
-        group_number: conflict.userActivity.group_number,
-        lecturers: conflict.userActivity.lecturers,
-        text: conflict.userActivity.start_time + conflict.userActivity.end_time + "\n" + conflict.userActivity.course_name + conflict.userActivity.classtype_name + "\n" + conflict.userActivity.group_number + conflict.userActivity.lecturers,
-        is_usos: conflict.userActivity.is_usos
-    })
-
+    conflictActivities.push(mapActivitiesToEvents([conflict.userActivity])[0])
     conflict.usosActivities.map((activity) => {
         if ( Number(activity.start_time.substring(11,13)) < minH){
             minH = Number(activity.start_time.substring(11,13))
