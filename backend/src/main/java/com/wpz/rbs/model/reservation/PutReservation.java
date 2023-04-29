@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReservation {
+public class PutReservation {
     @NotEmpty
     private String name;
     @NotEmpty

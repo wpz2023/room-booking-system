@@ -56,7 +56,7 @@ public class ActivityImportService {
         return activities;
     }
 
-    private List<Activity> importRoomActivitiesWeek(int roomId, Date date) throws IOException, ParseException {
+    private List<Activity> importRoomActivitiesWeek(int roomId, Date date) throws IOException {
 
         List<ActivityUsos> activitiesUsos = fetchRoomActivities(roomId, date);
 
@@ -64,7 +64,7 @@ public class ActivityImportService {
         for (var au : activitiesUsos) {
             Activity activity = new Activity(au.type, au.start_time, au.end_time, au.url, au.course_name, au.classtype_name, au.group_number, au.room_id, true);
 
-            for (int lecturer_id : au.lecturer_ids) {
+            for (String lecturer_id : au.lecturer_ids) {
                 var lecturer = lecturerImportService.getOrImportLecturer(lecturer_id);
                 activity.getLecturers().add(lecturer);
             }
@@ -76,7 +76,7 @@ public class ActivityImportService {
         return activities;
     }
 
-    private List<ActivityUsos> fetchRoomActivities(int roomId, Date startDate) throws IOException, ParseException {
+    private List<ActivityUsos> fetchRoomActivities(int roomId, Date startDate) throws IOException {
 
         String startDateString = StaticHelpers.dateToString(startDate);
 

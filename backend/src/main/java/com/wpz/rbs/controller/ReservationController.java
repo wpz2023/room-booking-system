@@ -1,7 +1,7 @@
 package com.wpz.rbs.controller;
 
 import com.wpz.rbs.model.Reservation;
-import com.wpz.rbs.model.reservation.CreateReservation;
+import com.wpz.rbs.model.reservation.PutReservation;
 import com.wpz.rbs.service.ReservationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,8 +20,13 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping()
+    public List<Reservation> getAllReservations() {
+        return reservationService.getAll();
+    }
+
     @PostMapping()
-    public ResponseEntity<?> createReservation(@RequestBody @Validated CreateReservation reservation) throws ParseException {
+    public ResponseEntity<?> createReservation(@RequestBody @Validated PutReservation reservation) throws ParseException {
         return reservationService.createReservation(reservation);
     }
 
@@ -30,14 +35,18 @@ public class ReservationController {
         return reservationService.getById(id);
     }
 
+    @PatchMapping("{id}")
+    public ResponseEntity<?> updateReservation(@PathVariable int id, @RequestBody @Validated PutReservation editedReservation) throws ParseException {
+        return reservationService.updateReservation(id, editedReservation);
+    }
+
     @GetMapping("room/{roomId}")
     public List<Reservation> getReservationsByRoom(@PathVariable int roomId) {
         return reservationService.getByRoomId(roomId);
     }
 
-    @GetMapping()
-    public List<Reservation> getAllReservations() {
-        return reservationService.getAll();
+    @PutMapping("manage/{id}")
+    public ResponseEntity<?> acceptReservation(@PathVariable int id) throws ParseException {
+        return reservationService.confirmReservation(id);
     }
-
 }

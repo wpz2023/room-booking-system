@@ -12,13 +12,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Lecturer {
-    
     @Id
-    private int id; 
+    private String id;
 
     @Column
     private String first_name;
 
     @Column
     private String last_name;
+
+    public Lecturer() {
+    }
+
+    public Lecturer(String id, String first_name, String last_name) {
+        this.id = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
+    }
 }

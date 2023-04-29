@@ -28,7 +28,7 @@ public class ActivityUsos {
     public Map<String,String> classtype_name;
 
     @JsonProperty("lecturer_ids")
-    public List<Integer> lecturer_ids;
+    public List<String> lecturer_ids;
 
     @JsonProperty
     public int group_number;
