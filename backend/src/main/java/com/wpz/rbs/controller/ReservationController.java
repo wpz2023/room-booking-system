@@ -1,7 +1,7 @@
 package com.wpz.rbs.controller;
 
 import com.wpz.rbs.model.Reservation;
-import com.wpz.rbs.model.reservation.PutReservation;
+import com.wpz.rbs.model.reservation.ReservationDTO;
 import com.wpz.rbs.service.ReservationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,33 +20,33 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping()
+    @PostMapping()
+    public ResponseEntity<?> createReservation(@RequestBody @Validated ReservationDTO reservation) throws ParseException {
+        return reservationService.createReservation(reservation);
+    }
+
+    @GetMapping("manage")
     public List<Reservation> getAllReservations() {
         return reservationService.getAll();
     }
 
-    @PostMapping()
-    public ResponseEntity<?> createReservation(@RequestBody @Validated PutReservation reservation) throws ParseException {
-        return reservationService.createReservation(reservation);
-    }
-
-    @GetMapping("{id}")
+    @GetMapping("manage/{id}")
     public Reservation getReservationById(@PathVariable int id) {
         return reservationService.getById(id);
     }
 
-    @PatchMapping("{id}")
-    public ResponseEntity<?> updateReservation(@PathVariable int id, @RequestBody @Validated PutReservation editedReservation) throws ParseException {
-        return reservationService.updateReservation(id, editedReservation);
-    }
-
-    @GetMapping("room/{roomId}")
+    @GetMapping("manage/room/{roomId}")
     public List<Reservation> getReservationsByRoom(@PathVariable int roomId) {
         return reservationService.getByRoomId(roomId);
     }
 
     @PutMapping("manage/{id}")
+    public ResponseEntity<?> updateAndAcceptReservation(@PathVariable int id, @RequestBody @Validated ReservationDTO editedReservation) throws ParseException {
+        return reservationService.updateAndAcceptReservation(id, editedReservation);
+    }
+
+    @PostMapping("manage/{id}/accept")
     public ResponseEntity<?> acceptReservation(@PathVariable int id) throws ParseException {
-        return reservationService.confirmReservation(id);
+        return reservationService.acceptReservation(id);
     }
 }

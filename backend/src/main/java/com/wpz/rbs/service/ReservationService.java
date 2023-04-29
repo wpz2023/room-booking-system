@@ -3,7 +3,7 @@ package com.wpz.rbs.service;
 import com.wpz.rbs.model.Activity;
 import com.wpz.rbs.model.Lecturer;
 import com.wpz.rbs.model.Reservation;
-import com.wpz.rbs.model.reservation.PutReservation;
+import com.wpz.rbs.model.reservation.ReservationDTO;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.repository.ReservationRepository;
 import com.wpz.rbs.repository.RoomRepository;
@@ -43,7 +43,7 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public ResponseEntity<?> createReservation(PutReservation reservation) throws ParseException {
+    public ResponseEntity<?> createReservation(ReservationDTO reservation) throws ParseException {
         ResponseEntity<?> result = checkNewOrEditedReservation(reservation);
         if (result != null)
             return result;
@@ -53,8 +53,7 @@ public class ReservationService {
         return ResponseEntity.ok(savedReservation.getId());
     }
 
-    @Transactional
-    public ResponseEntity<?> confirmReservation(int id) throws ParseException {
+    public ResponseEntity<?> acceptReservation(int id) throws ParseException {
         Optional<Reservation> reservationOptional = reservationRepository.findById(id);
         if (reservationOptional.isEmpty())
             return ResponseEntity.status(400).body("Reservation with given id doesn't exist");
@@ -65,6 +64,39 @@ public class ReservationService {
         if (collisionExists(reservation.getRoom_id(), StaticHelpers.parseDateTime(reservation.getStart_time()), StaticHelpers.parseDateTime(reservation.getEnd_time())))
             return ResponseEntity.status(409).body("Room reservation collision detected");
 
+        String activityId = acceptReservationNoChecks(reservation);
+        emailService.sendAcceptedMessageToUser(reservation);
+
+        return ResponseEntity.status(200).body(activityId);
+    }
+
+    @Transactional
+    public ResponseEntity<?> updateAndAcceptReservation(int reservationId, ReservationDTO editedReservation) throws ParseException {
+        Optional<Reservation> reservationOptional = reservationRepository.findById(reservationId);
+        if (reservationOptional.isEmpty())
+            return ResponseEntity.status(400).body("Reservation with given id doesn't exist");
+
+        Reservation reservation = reservationOptional.get();
+        if (reservation.is_confirmed())
+            return ResponseEntity.status(409).body("Reservation is already confirmed");
+
+        ResponseEntity<?> result = checkNewOrEditedReservation(editedReservation);
+        if (result != null)
+            return result;
+
+        reservation = new Reservation(editedReservation);
+        reservation.setId(reservationId);
+        reservationRepository.save(reservation);
+
+        // updating also accepts reservation
+        String activityId = acceptReservationNoChecks(reservation);
+        emailService.sendChangedMessageToUser(reservation);
+
+        return ResponseEntity.status(200).body(activityId);
+    }
+
+    @Transactional
+    private String acceptReservationNoChecks(Reservation reservation) {
         Activity activity = new Activity("classgroup", reservation.getStart_time(), reservation.getEnd_time(), String.valueOf(reservation.getId()), new HashMap<>() {{
             put("pl", reservation.getName());
             put("en", reservation.getName());
@@ -83,32 +115,10 @@ public class ReservationService {
         reservation.set_confirmed(true);
         reservationRepository.save(reservation);
 
-        emailService.sendAcceptedMessageToUser(reservation);
-        return ResponseEntity.status(200).body(activity.getId());
+        return activity.getId();
     }
 
-    public ResponseEntity<?> updateReservation(int reservationId, PutReservation editedReservation) throws ParseException {
-        Optional<Reservation> reservationOptional = reservationRepository.findById(reservationId);
-        if (reservationOptional.isEmpty())
-            return ResponseEntity.status(400).body("Reservation with given id doesn't exist");
-
-        Reservation reservation = reservationOptional.get();
-        if (reservation.is_confirmed())
-            return ResponseEntity.status(409).body("Reservation is already confirmed");
-
-        ResponseEntity<?> result = checkNewOrEditedReservation(editedReservation);
-        if (result != null)
-            return result;
-
-        reservation = new Reservation(editedReservation);
-        reservation.setId(reservationId);
-        reservationRepository.save(reservation);
-        emailService.sendChangedMessageToUser(reservation);
-
-        return ResponseEntity.status(200).build();
-    }
-
-    private ResponseEntity<?> checkNewOrEditedReservation(PutReservation reservation) throws ParseException {
+    private ResponseEntity<?> checkNewOrEditedReservation(ReservationDTO reservation) throws ParseException {
         if (!roomRepository.existsById(reservation.getRoom_id()))
             return ResponseEntity.status(400).body("Wrong room id");
 

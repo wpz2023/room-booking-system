@@ -1,6 +1,6 @@
 package com.wpz.rbs.model;
 
-import com.wpz.rbs.model.reservation.PutReservation;
+import com.wpz.rbs.model.reservation.ReservationDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +33,7 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(PutReservation reservation) {
+    public Reservation(ReservationDTO reservation) {
         this.start_time = reservation.getStart_time();
         this.end_time = reservation.getEnd_time();
         this.first_name = reservation.getFirst_name();
