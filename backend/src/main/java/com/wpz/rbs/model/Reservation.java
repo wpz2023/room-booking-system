@@ -1,6 +1,6 @@
 package com.wpz.rbs.model;
 
-import com.wpz.rbs.model.reservation.CreateReservation;
+import com.wpz.rbs.model.reservation.ReservationDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,11 +27,13 @@ public class Reservation {
     private String end_time;
     @Column
     private int room_id;
+    @Column
+    private boolean is_confirmed;
 
     public Reservation() {
     }
 
-    public Reservation(CreateReservation reservation) {
+    public Reservation(ReservationDTO reservation) {
         this.start_time = reservation.getStart_time();
         this.end_time = reservation.getEnd_time();
         this.first_name = reservation.getFirst_name();

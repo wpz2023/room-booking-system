@@ -23,11 +23,11 @@ public class LecturerService {
         return lecturers;
     }
 
-    public Lecturer getById(int id) {
+    public Lecturer getById(String id) {
         return lecturerRepository.findById(id).orElse(null);
     }
 
-    public Optional<Lecturer> getByIdOptional(int id) {
+    public Optional<Lecturer> getByIdOptional(String id) {
         return lecturerRepository.findById(id);
     }
 

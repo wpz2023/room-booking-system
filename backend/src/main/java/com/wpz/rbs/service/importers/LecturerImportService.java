@@ -23,7 +23,7 @@ public class LecturerImportService {
         this.lecturerService = lecturerService;
     }
 
-    public Lecturer getOrImportLecturer(int lecturerId) throws IOException {
+    public Lecturer getOrImportLecturer(String lecturerId) throws IOException {
         var lecturerOptional = lecturerService.getByIdOptional(lecturerId);
 
         if(lecturerOptional.isPresent()){

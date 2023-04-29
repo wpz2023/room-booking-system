@@ -1,9 +1,8 @@
 package com.wpz.rbs.repository;
 
+import com.wpz.rbs.model.Lecturer;
 import org.springframework.data.repository.CrudRepository;
 
-import com.wpz.rbs.model.Lecturer;
+public interface LecturerRepository extends CrudRepository<Lecturer, String> {
 
-public interface LecturerRepository extends CrudRepository<Lecturer, Integer> {
-    
 }
