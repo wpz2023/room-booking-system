@@ -10,13 +10,13 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Room {
     @Id
-    private int id;
+    private Integer id;
     @Column
     private String number;
     @Column
     private String type;
     @Column
-    private int capacity;
+    private Integer capacity;
     @Column
     @Enumerated(EnumType.STRING)
     private RoomAnnotation roomAnnotation = RoomAnnotation.EMPTY;

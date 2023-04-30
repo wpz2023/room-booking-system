@@ -19,8 +19,14 @@ public class RoomController {
     }
 
     @GetMapping("/room")
-    private List<Room> getAll() {
-        return roomService.getAll();
+    private ResponseEntity<List<Room>> getAllFiltered(String number, String type, Integer capacityMin, String annotation, String startTime, String endTime) {
+
+        if((startTime == null && endTime != null) || (startTime != null && endTime == null)){
+            return ResponseEntity.status(400).body(null);
+        }
+
+        var rooms = roomService.getAllFiltered(number, type, capacityMin, annotation, startTime, endTime);
+        return ResponseEntity.ok(rooms);
     }
 
     @GetMapping("/room/{id}")
