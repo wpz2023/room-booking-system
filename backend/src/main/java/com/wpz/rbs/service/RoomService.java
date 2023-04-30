@@ -2,6 +2,7 @@ package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.RoomAnnotation;
+import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.repository.RoomRepository;
 
 import org.springframework.data.domain.Example;
@@ -14,20 +15,32 @@ import java.util.List;
 public class RoomService {
 
     private final RoomRepository roomRepository;
+    private final ActivityRepository activityRepository;
 
-    public RoomService(RoomRepository roomRepository) {
+    public RoomService(RoomRepository roomRepository, ActivityRepository activityRepository) {
         this.roomRepository = roomRepository;
+        this.activityRepository = activityRepository;
     }
 
-    public List<Room> getAllFiltered(String number, String type, Integer capacity, String annotation) {
+    public List<Room> getAllFiltered(String number, String type, Integer capacityMin, String annotation, String startTime, String endTime) {
         var exampleRoom = new Room();
         exampleRoom.setNumber(number);
         exampleRoom.setType(type);
-        exampleRoom.setCapacity(capacity);
         exampleRoom.setRoomAnnotation(RoomAnnotation.getByAnnotation(annotation));
 
         List<Room> rooms = new ArrayList<>();
-        roomRepository.findAll(Example.of(exampleRoom)).forEach(rooms::add);
+        roomRepository.findAll(Example.of(exampleRoom)).forEach( (room) -> {
+            if(capacityMin != null){
+                if(room.getCapacity() < capacityMin) return;
+            }
+
+            if(startTime != null && endTime != null){
+                var activities = activityRepository.findAllByRoomIdAndOverlappingStartTimeAndEndTime(room.getId(), startTime, endTime);
+                if(activities.size() != 0) return;
+            }
+
+            rooms.add(room);
+        });
         return rooms;
     }
 
