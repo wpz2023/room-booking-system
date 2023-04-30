@@ -3,6 +3,8 @@ package com.wpz.rbs.service;
 import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.RoomAnnotation;
 import com.wpz.rbs.repository.RoomRepository;
+
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,9 +19,15 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
-    public List<Room> getAll() {
+    public List<Room> getAllFiltered(String number, String type, Integer capacity, String annotation) {
+        var exampleRoom = new Room();
+        exampleRoom.setNumber(number);
+        exampleRoom.setType(type);
+        exampleRoom.setCapacity(capacity);
+        exampleRoom.setRoomAnnotation(RoomAnnotation.getByAnnotation(annotation));
+
         List<Room> rooms = new ArrayList<>();
-        roomRepository.findAll().forEach(rooms::add);
+        roomRepository.findAll(Example.of(exampleRoom)).forEach(rooms::add);
         return rooms;
     }
 

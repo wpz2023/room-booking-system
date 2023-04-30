@@ -19,8 +19,8 @@ public class RoomController {
     }
 
     @GetMapping("/room")
-    private List<Room> getAll() {
-        return roomService.getAll();
+    private List<Room> getAllFiltered(String number, String type, Integer capacity, String annotation) {
+        return roomService.getAllFiltered(number, type, capacity, annotation);
     }
 
     @GetMapping("/room/{id}")
