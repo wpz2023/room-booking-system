@@ -5,22 +5,16 @@ import Api from "../Api";
 import ConflictPopUp from "./ConflictPopUp";
 import {Conflict} from "../models/Conflict";
 
-interface RoomData {
-    id: Number,
-    name: string
-}
 
 function ImportData() {
     const token = window.sessionStorage.getItem("jwtToken");
     const [popupVisible, setPopupVisible] = useState<boolean>(false)
     const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([])
-    // const [room, setRoomId] = useState<RoomData>({id:0, name:""});
-    const [roomName, setRoomName] = useState("");
-    const [roomId, setRoomId] = useState(0)
+    const [clickedRoom, setRoom] = useState<RoomData>({capacity: 0, roomAnnotation: undefined, type: "", id: 0, number: 0});
 
     useEffect(() => {
         if (activitiesToDelete.length > 0) {
-            mutate(roomId)
+            mutate(clickedRoom.id)
         }
     }, [activitiesToDelete])
 
@@ -42,15 +36,15 @@ function ImportData() {
         });
 
     const getRoomActivities = async () => {
-        if (roomId != 0) {
+        if (clickedRoom.id != 0) {
             return await Api.authApi
-                .get(`import/activity/${roomId}`, {
+                .get(`import/activity/${clickedRoom.id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 })
                 .then((res) => res.data)
-                .finally(async () => await mutate(roomId));
+                .finally(async () => await mutate(clickedRoom.id));
         }
         return null
     }
@@ -63,6 +57,9 @@ function ImportData() {
         enabled: false,
     });
 
+    useEffect(() => {
+        refetchRoomActivities()
+    }, [clickedRoom])
 
     const getImportRooms = () => {
         return Api.authApi
@@ -88,17 +85,13 @@ function ImportData() {
     };
 
     const onButtonClick = (e) => {
-        setRoomId(e.target.dataset.value1)
-        setRoomName(e.target.dataset.value2)
+        e.preventDefault();
+        setRoom({...clickedRoom, id: e.currentTarget.dataset.value1, number: e.currentTarget.dataset.value2})
     }
 
     const deleteActivities = (activities: string[]) => {
         setActivitiesToDelete(activities)
     }
-
-    useEffect(() => {
-        refetchRoomActivities()
-    }, [roomId])
 
     return (
         <div className="flex flex-col items-center pt-20 pb-6">
@@ -134,7 +127,7 @@ function ImportData() {
                                     bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
                                             Importuj plan
                                         </button>
-                                        {isActivitiesFetching && roomId == room.id && (
+                                        {isActivitiesFetching && clickedRoom.id == room.id && (
                                             <p className="pt-2 font-normal">Importowanie planu</p>
                                         )}
                                     </div>
@@ -144,7 +137,7 @@ function ImportData() {
                     </ul>
                     {popupVisible &&
                         <ConflictPopUp conflict={roomConflict} onClose={() => setPopupVisible(false)}
-                                       deleteActivities={deleteActivities} roomName={roomName}/>}
+                                       deleteActivities={deleteActivities} roomName={clickedRoom.number}/>}
                 </div>
             )}
         </div>
