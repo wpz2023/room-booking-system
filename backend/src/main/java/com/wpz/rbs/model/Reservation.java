@@ -28,7 +28,8 @@ public class Reservation {
     @Column
     private int room_id;
     @Column
-    private boolean is_confirmed;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status = ReservationStatus.OPEN;
 
     public Reservation() {
     }
