@@ -1,15 +1,15 @@
-import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
-import React, { useEffect, useRef } from "react";
-import { pl } from "date-fns/locale";
+import {Calendar, dateFnsLocalizer} from "react-big-calendar";
+import React, {useEffect, useRef} from "react";
+import {pl} from "date-fns/locale";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import { Lecturer } from "../models/Lecturer";
+import {EventData} from "../models/Activity";
+
 
 interface EventProps {
   event: EventData;
-  children?: React.ReactNode;
 }
 
 export type BackgroundEvent = {
@@ -18,18 +18,8 @@ export type BackgroundEvent = {
   course_name: string;
 };
 
-interface EventData {
-  start: Date;
-  end: Date;
-  course_name: Map<string, string>;
-  classtype_name: Map<string, string>;
-  group_number: number;
-  lecturers: Set<Lecturer>;
-  text: string;
-}
-
-const Event: React.FC<EventProps> = ({ event, children }) => {
-  const eventRef = useRef<HTMLDivElement>(null);
+const Event: React.FC<EventProps> = ({ event }) => {
+    const eventRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (eventRef.current) {
@@ -65,13 +55,12 @@ const Event: React.FC<EventProps> = ({ event, children }) => {
             {lecturer.first_name} {lecturer.last_name}
           </p>
         ))}
-      {children}
     </div>
   );
 };
 
 function NewCalendar({
-  activities,
+  activities, defaultView, views, minDate, maxDate, toolbar, date, step, eventPropGetter,
   backgroundEvent,
   handleSelectSlot,
 }: {
@@ -104,22 +93,25 @@ function NewCalendar({
       culture={"pl"}
       localizer={localizer}
       events={activities}
-      defaultView={Views.WEEK}
-      views={[Views.WEEK]}
+      defaultView={defaultView}
+      views={views}
       components={{
         event: Event,
       }}
       backgroundEvents={backgroundEvents}
-      step={15}
+      step={step}
+      toolbar={toolbar}
+      date={date}
       tooltipAccessor={tooltipAccessor}
       dayLayoutAlgorithm="no-overlap"
+      eventPropGetter={eventPropGetter}
       startAccessor="start"
       endAccessor="end"
       onSelectSlot={handleSelectSlot}
       selectable
       style={{ height: "full" }}
-      min={new Date(0, 0, 0, 6, 0, 0)}
-      max={new Date(0, 0, 0, 22, 0, 0)}
+      min={minDate}
+      max={maxDate}
       messages={{
         allDay: "Cały dzień",
         previous: "Poprzedni",
