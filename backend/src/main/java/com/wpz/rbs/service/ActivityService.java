@@ -77,16 +77,16 @@ public class ActivityService {
             return null;
         }
 
-        List<String> usosConflictsIds = new ArrayList<>();
+        List<Activity> usosConflicts = new ArrayList<>();
 
         for (Activity userActivity : userActivities) {
             for (Activity usosActivity : usosActivities) {
                 if (StaticHelpers.activitiesOverlapping(userActivity, usosActivity)) {
-                    usosConflictsIds.add(usosActivity.getId());
+                    usosConflicts.add(usosActivity);
                 }
             }
-            if (!usosConflictsIds.isEmpty()) {
-                return new ActivityConflict(usosConflictsIds, userActivity.getId());
+            if (!usosConflicts.isEmpty()) {
+                return new ActivityConflict(usosConflicts, userActivity);
             }
         }
 

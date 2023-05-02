@@ -7,7 +7,8 @@ import {Activity} from "../models/Activity";
 import 'moment/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import NewCalendar from "./Calendar";
-
+import {Views} from "react-big-calendar";
+import {mapActivitiesToEvents} from "../utils/MapActivitiesToEvents";
 
 
 
@@ -62,52 +63,8 @@ function Room() {
         refetchActivities();
     }, []);
 
-
-    // zmiana nazwy typu zajęć na krótszą formę
-    const changeClasstypeName = (classType: Map<string, string>) => {
-        if (classType["pl"]=="Wykład"){
-            classType["pl"] = "WYK"
-        } else if (classType["pl"]=="Ćwiczenia"){
-            classType["pl"] =  "CW"
-        } else if (classType["pl"]=="Konwersatorium"){
-            classType["pl"] = "KON"
-        } else if (classType["pl"]=="Laboratorium"){
-            classType["pl"] = "LAB"
-        } else if (classType["pl"]=="Seminarium"){
-            classType["pl"] = "SEM"
-        } else if (classType["pl"]=="Pracownia"){
-            classType["pl"] = "PRA"
-        } else if (classType["pl"]=="Pracownia komputerowa"){
-            classType["pl"] = "PKO"
-        } else if (classType["pl"]=="Lektorat"){
-            classType["pl"] = "LEK"
-        } else if (classType["pl"]=="Warsztat"){
-            classType["pl"] = "WAR"
-        }
-        return classType;
-    }
-
     // przechowuje eventy do wyświetlenia w kalendarzu
-    const roomActivities = activities?.map(activity => ({
-        ...activity,
-        start: new Date(Number(activity.start_time.substring(0,4)), //year
-            Number(activity.start_time.substring(5,7))-1, // month
-            Number(activity.start_time.substring(8,10)), // day
-            Number(activity.start_time.substring(11,13)), // hour
-            Number(activity.start_time.substring(14,16)), // minute
-        ),
-        end: new Date(Number(activity.end_time.substring(0,4)), //year
-            Number(activity.end_time.substring(5,7))-1, // month
-            Number(activity.end_time.substring(8,10)), // day
-            Number(activity.end_time.substring(11,13)), // hour
-            Number(activity.end_time.substring(14,16)), // minute
-        ),
-        course_name: activity.course_name,
-        classtype_name: changeClasstypeName(activity.classtype_name),
-        group_number: activity.group_number,
-        lecturers: activity.lecturers,
-        text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
-    } ));
+    const roomActivities = mapActivitiesToEvents(activities);
 
     const pushNewRoomAnnotation = useMutation((newAnnotation) => {
         const roomData = {
@@ -173,7 +130,10 @@ function Room() {
                         <div className="flex flex-col my-8">
                             <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                             <div>
-                                <NewCalendar activities={roomActivities}/>
+                                <NewCalendar activities={roomActivities} defaultView={Views.WEEK} views={[Views.WEEK]}
+                                             minDate={new Date(0, 0, 0, 6, 0, 0)}
+                                             maxDate={new Date(0, 0, 0, 22, 0, 0)}
+                                             toolbar={true} step={15}/>
                             </div>
                             <div>
                                 <p>tutaj dodanie rezerwacji</p>
