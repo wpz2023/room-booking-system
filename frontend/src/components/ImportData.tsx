@@ -16,10 +16,6 @@ function ImportData() {
       .then((res) => res.data);
   };
 
-  const handleClick = () => {
-    refetch();
-  };
-
   const { isFetching, data, refetch } = useQuery<RoomData[]>(
     ["data"],
     getImportRooms,
@@ -28,6 +24,11 @@ function ImportData() {
       enabled: false,
     }
   );
+
+  const handleClick = () => {
+    refetch();
+  };
+
 
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
@@ -48,7 +49,7 @@ function ImportData() {
           {data && (
             <div className="w-[450px] px-6">
               <p className="font-medium">Numer sali</p>
-              <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
+              <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-700" />
             </div>
           )}
           <ul role="list" className="w-[450px] p-6 divide-y divide-slate-200">

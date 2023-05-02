@@ -60,7 +60,7 @@ function Login() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    tokenMutation.mutate();
+    await tokenMutation.mutate();
   };
 
   return (
