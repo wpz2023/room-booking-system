@@ -49,4 +49,9 @@ public class ReservationController {
     public ResponseEntity<?> acceptReservation(@PathVariable int id) throws ParseException {
         return reservationService.acceptReservation(id);
     }
+
+    @PostMapping("manage/{id}/decline")
+    public ResponseEntity<?> declineReservation(@PathVariable int id) throws ParseException {
+        return reservationService.declineReservation(id);
+    }
 }
