@@ -7,13 +7,15 @@ import { Activity } from "../models/Activity";
 import "moment/locale/pl";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import NewCalendar, { BackgroundEvent } from "./Calendar";
-import {Views} from "react-big-calendar";
-import {mapActivitiesToEvents} from "../utils/MapActivitiesToEvents";import ReservationForm from "./ReservationForm";
+import { Views } from "react-big-calendar";
+import { mapActivitiesToEvents } from "../utils/MapActivitiesToEvents";
+import ReservationForm from "./ReservationForm";
 
 function Room() {
   const { id } = useParams();
   const [roomAnnotation, setRoomAnnotation] = useState<String | undefined>();
   const [backgroundEvent, setBackgroundEvent] = useState<BackgroundEvent>();
+  
   let token = window.sessionStorage.getItem("jwtToken");
 
   useEffect(() => {
@@ -52,23 +54,18 @@ function Room() {
     return Api.Api.get(`activity/room/${id}`).then((res) => res.data);
   };
 
-    // dane do zarządzania informacjami nt. rezerwacji danej sali
-    let {
-        data: activities,
-        isFetching: isRoomActivitiesFetching,
-        refetch: refetchActivities
-    } = useQuery<Activity[]>(["activities"], getRoomActivities, {
-        refetchOnWindowFocus: false,
-        enabled: true
-    });
+  // dane do zarządzania informacjami nt. rezerwacji danej sali
+  let {
+    data: activities,
+    isFetching: isRoomActivitiesFetching,
+    refetch: refetchActivities,
+  } = useQuery<Activity[]>(["activities"], getRoomActivities, {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
-    useEffect(() => {
-        refetchRoom();
-        refetchActivities();
-    }, []);
-
-    // przechowuje eventy do wyświetlenia w kalendarzu
-    const roomActivities = mapActivitiesToEvents(activities);
+  // przechowuje eventy do wyświetlenia w kalendarzu
+  const roomActivities = mapActivitiesToEvents(activities);
 
   const pushNewRoomAnnotation = useMutation((newAnnotation) => {
     const roomData = {
@@ -91,7 +88,12 @@ function Room() {
   };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-    setBackgroundEvent({ start: start, end: end, course_name: "rezerwacja" });
+    setBackgroundEvent({
+      start: start,
+      end: end,
+      course_name: { pl: "REZERWACJA" },
+      id: 0,
+    });
   };
 
   return (
@@ -151,16 +153,19 @@ function Room() {
               <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
               <div>
                 <NewCalendar
-                  activities={roomActivities} defaultView={Views.WEEK} views={[Views.WEEK]}
-                                             minDate={new Date(0, 0, 0, 6, 0, 0)}
-                                             maxDate={new Date(0, 0, 0, 22, 0, 0)}
-                                             toolbar={true} step={15}
+                  activities={roomActivities}
+                  defaultView={Views.WEEK}
+                  views={[Views.WEEK]}
+                  minDate={new Date(0, 0, 0, 6, 0, 0)}
+                  maxDate={new Date(0, 0, 0, 22, 0, 0)}
+                  toolbar={true}
+                  step={15}
                   backgroundEvent={backgroundEvent}
                   handleSelectSlot={handleSelectSlot}
                 />
               </div>
               <div>
-                <ReservationForm roomdId={id} startTime="" endTime="" />
+                <ReservationForm roomId={id} event={backgroundEvent} />
               </div>
             </div>
           </div>

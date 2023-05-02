@@ -1,12 +1,11 @@
-import {Calendar, dateFnsLocalizer} from "react-big-calendar";
-import React, {useEffect, useRef} from "react";
-import {pl} from "date-fns/locale";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import React, { useEffect, useRef } from "react";
+import { pl } from "date-fns/locale";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import {EventData} from "../models/Activity";
-
+import { EventData } from "../models/Activity";
 
 interface EventProps {
   event: EventData;
@@ -15,11 +14,12 @@ interface EventProps {
 export type BackgroundEvent = {
   start: Date;
   end: Date;
-  course_name: string;
+  course_name: {};
+  id: number;
 };
 
 const Event: React.FC<EventProps> = ({ event }) => {
-    const eventRef = useRef<HTMLDivElement>(null);
+  const eventRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (eventRef.current) {
@@ -60,7 +60,15 @@ const Event: React.FC<EventProps> = ({ event }) => {
 };
 
 function NewCalendar({
-  activities, defaultView, views, minDate, maxDate, toolbar, date, step, eventPropGetter,
+  activities,
+  defaultView,
+  views,
+  minDate,
+  maxDate,
+  toolbar,
+  date,
+  step,
+  eventPropGetter,
   backgroundEvent,
   handleSelectSlot,
 }: {
