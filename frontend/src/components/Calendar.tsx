@@ -71,10 +71,12 @@ function NewCalendar({
   eventPropGetter,
   backgroundEvent,
   handleSelectSlot,
+  selectable,
 }: {
   activities: EventData[];
   backgroundEvent: BackgroundEvent | undefined;
   handleSelectSlot: ({ start, end }: { start: Date; end: Date }) => void;
+  selectable?: boolean;
 }) {
   const backgroundEvents = [backgroundEvent as EventData];
   const tooltipAccessor = (event: EventData) => {
@@ -116,7 +118,7 @@ function NewCalendar({
       startAccessor="start"
       endAccessor="end"
       onSelectSlot={handleSelectSlot}
-      selectable
+      selectable={selectable}
       style={{ height: "full" }}
       min={minDate}
       max={maxDate}

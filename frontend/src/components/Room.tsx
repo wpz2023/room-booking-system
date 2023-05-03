@@ -162,6 +162,7 @@ function Room() {
                   step={15}
                   backgroundEvent={backgroundEvent}
                   handleSelectSlot={handleSelectSlot}
+                  selectable={true}
                 />
               </div>
               <div>
