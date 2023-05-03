@@ -1,9 +1,14 @@
-import React from 'react'
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 function Reservation() {
-  return (
-    <div className='p-6'>Reservation</div>
-  )
+  const { id } = useParams();
+  let token = window.sessionStorage.getItem("jwtToken");
+
+  useEffect(() => {
+    token = window.sessionStorage.getItem("jwtToken");
+  }, [token]);
+  return <div className="p-6">Reservation {id}</div>;
 }
 
-export default Reservation
+export default Reservation;

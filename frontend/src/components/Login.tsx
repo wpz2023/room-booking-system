@@ -46,7 +46,13 @@ function Login() {
       window.sessionStorage.setItem("jwtToken", tokenMutation.data?.token);
       setEmail("");
       setPassword("");
-      navigate("/import", { replace: true });
+      const path = sessionStorage.getItem("page") as string;
+      if (path != "") {
+        navigate(path, { replace: true });
+        sessionStorage.setItem("page", "");
+      } else {
+        navigate("/sale");
+      }
     }
   }, [tokenMutation.isSuccess]);
 

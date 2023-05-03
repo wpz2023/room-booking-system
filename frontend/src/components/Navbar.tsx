@@ -47,7 +47,7 @@ function Navbar() {
           <button className="relative flex items-center p-4">
             {!token ? (
               <Link to="/login" className="hover:text-blue-800">
-                Login
+                Zaloguj się
               </Link>
             ) : (
               <Link
@@ -55,7 +55,7 @@ function Navbar() {
                 className="hover:text-blue-800"
                 onClick={logout}
               >
-                Logout
+                Wyloguj się
               </Link>
             )}
           </button>
