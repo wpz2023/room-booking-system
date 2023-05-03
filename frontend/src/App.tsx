@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Room from "./components/Room";
 import AuthRoute from "./AuthRoute";
 import Api from "./Api";
+import Reservations from "./components/Reservations";
 
 function AxiosInterceptorNavigate() {
   let navigate = useNavigate();
@@ -24,7 +25,25 @@ function App() {
             <Route index element={<Rooms />} />
             <Route path=":id" element={<Room />} />
           </Route>
-          <Route path="rezerwacja" element={<Reservation />} />
+          <Route path="rezerwacja">
+            <Route
+              index
+              element={
+                <AuthRoute>
+                  <Reservations />
+                </AuthRoute>
+              }
+            />
+            <Route
+              path=":id"
+              element={
+                <AuthRoute>
+                  <Reservation />
+                </AuthRoute>
+              }
+            />
+          </Route>
+
           <Route
             path="import"
             element={
