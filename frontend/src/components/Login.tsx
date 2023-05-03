@@ -13,6 +13,14 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    userRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    setError("");
+  }, [email, password]);
+
   const tokenMutation = useMutation({
     mutationFn: async () => {
       const data = await Api.Api.post("auth/authenticate", {
@@ -32,14 +40,6 @@ function Login() {
       errRef.current?.focus();
     },
   });
-
-  useEffect(() => {
-    userRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    setError("");
-  }, [email, password]);
 
   useEffect(() => {
     if (tokenMutation.isSuccess) {
@@ -66,7 +66,7 @@ function Login() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    tokenMutation.mutate();
+    await tokenMutation.mutate();
   };
 
   return (
