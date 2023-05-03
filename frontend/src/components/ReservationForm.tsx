@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Api from "../Api";
 import { BackgroundEvent } from "./Calendar";
@@ -29,7 +31,7 @@ function ReservationForm({
     },
   });
 
-  const { register, handleSubmit, formState } = form;
+  const { register, handleSubmit, formState, reset } = form;
   const { errors } = formState;
 
   const [calendarWarning, setCalendarWarning] = useState(true);
@@ -57,7 +59,12 @@ function ReservationForm({
     },
   });
 
-  useEffect(() => {}, [reserve?.isSuccess]);
+  useEffect(() => {
+    if (reserve?.isSuccess) {
+      toast.success("Udało ci się stworzyć rezerwację!");
+      reset();
+    }
+  }, [reserve?.isSuccess]);
 
   const onSubmit = async (
     data: FormValues,
@@ -77,6 +84,7 @@ function ReservationForm({
 
   return (
     <div className="m-10">
+      <ToastContainer />
       {!calendarWarning && (
         <p className=" text-red-700 font-big text-xl">
           "Proszę zaznaczyć zajęcia na kalendarzu"
