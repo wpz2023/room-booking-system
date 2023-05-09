@@ -1,5 +1,6 @@
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
+import {useEffect} from "react";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -18,15 +19,21 @@ const authApi = axios.create({
 });
 
 const AxiosInterceptorsSetup = (navigate: NavigateFunction) => {
-  authApi.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response.status === 500) {
-        window.sessionStorage.removeItem("jwtToken");
-        navigate("/login");
-      }
-    }
-  );
+  useEffect(() => {
+    const interceptor = authApi.interceptors.response.use(
+        (response) => response,
+        (error) => {
+          if (error.response.status === 500) {
+            window.sessionStorage.removeItem("jwtToken");
+            navigate("/login");
+          }
+        }
+    );
+
+    return () => {
+      authApi.interceptors.response.eject(interceptor);
+    };
+  }, [navigate]);
 };
 
 export default { Api, authApi, AxiosInterceptorsSetup };
