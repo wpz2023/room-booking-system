@@ -43,6 +43,8 @@ function ImportData() {
       onSuccess: (responseData) => {
         if (responseData) {
           setPopupVisible(true);
+        } else {
+          toast.success("Udało się zaimportować plan sali");
         }
       },
     }
@@ -65,7 +67,6 @@ function ImportData() {
   const {
     isFetching: isActivitiesFetching,
     refetch: refetchRoomActivities,
-    isSuccess,
   } = useQuery(["roomActivities"], getRoomActivities, {
     refetchOnWindowFocus: false,
     enabled: false,
@@ -74,12 +75,6 @@ function ImportData() {
   useEffect(() => {
     refetchRoomActivities();
   }, [clickedRoom]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success("Udało się zaimportować plan sali");
-    }
-  }, [isSuccess]);
 
   const getImportRooms = () => {
     return Api.authApi
