@@ -6,16 +6,17 @@ import Api from "../Api";
 import { Activity } from "../models/Activity";
 import "moment/locale/pl";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import NewCalendar, { BackgroundEvent } from "./Calendar";
+import NewCalendar, { BackgroundEvent } from "../components/Calendar";
 import { Views } from "react-big-calendar";
 import { mapActivitiesToEvents } from "../utils/MapActivitiesToEvents";
-import ReservationForm from "./ReservationForm";
+import ReservationForm from "../components/ReservationForm";
+import { getRoomInfo } from "../utils/GetRoomInfo";
 
 function Room() {
   const { id } = useParams();
   const [roomAnnotation, setRoomAnnotation] = useState<String | undefined>();
   const [backgroundEvent, setBackgroundEvent] = useState<BackgroundEvent>();
-  
+
   let token = window.sessionStorage.getItem("jwtToken");
 
   useEffect(() => {
@@ -28,19 +29,11 @@ function Room() {
     refetchRoom();
   }, [token]);
 
-  const getRoomInfo = () => {
-    return Api.Api.get(`room/${id}`).then((res) => res.data);
-  };
-
-  // zmienne do zarządzania informacjami nt. sali
   const {
     data: room,
     isFetching: isRoomFetching,
     refetch: refetchRoom,
-  } = useQuery<RoomData>(["room_info"], getRoomInfo, {
-    refetchOnWindowFocus: false,
-    enabled: true,
-  });
+  } = getRoomInfo(id);
 
   useEffect(() => {
     if (room?.roomAnnotation === null) {
@@ -65,7 +58,7 @@ function Room() {
   });
 
   // przechowuje eventy do wyświetlenia w kalendarzu
-  const roomActivities = mapActivitiesToEvents(activities);
+  const roomActivities = mapActivitiesToEvents(activities as Activity[]);
 
   const pushNewRoomAnnotation = useMutation((newAnnotation) => {
     const roomData = {

@@ -17,7 +17,7 @@ export function mapActivitiesToEvents(activities: Activity[]) {
             Number(activity.end_time.substring(14,16)), // minute
         ),
         course_name: activity.course_name,
-        classtype_name: changeClasstypeName(activity.classtype_name),
+        classtype_name: changeClasstypeName({ classType: activity.classtype_name }),
         group_number: activity.group_number,
         lecturers: activity.lecturers,
         text: activity.start_time + activity.end_time + "\n" + activity.course_name + activity.classtype_name + "\n" + activity.group_number + activity.lecturers,
