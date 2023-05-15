@@ -25,6 +25,21 @@ function Rooms() {
     const value = parseInt(e.target.value) || 0;
     setMinCapacity(value);
   }
+  const onAnnotationChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    setAnnotation(e.target.value);
+  };
+
+  const onFilterDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterDate(!filterDate)
+  }
+  const onFilterCapacityChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterCapacity(!filterCapacity);
+  }
+  const onFilterAnnotationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterAnnotation(!filterAnnotation)
+  }
+
   const handleFilter = ()=>{
     roomsQuery.refetch();
   }
@@ -70,7 +85,7 @@ function Rooms() {
           <div className="mb-2 p-3 bg-gray-200 rounded-lg flex-none flex-col">
 
             <div className="mb-1 flex flex-row p-1 bg-gray-300 rounded-md">
-              <input className="m-2" checked={filterDate} type="checkbox" onChange={() => setFilterDate(!filterDate)}></input>
+              <input className="m-2" checked={filterDate} type="checkbox" onChange={onFilterDateChange}></input>
               <div>
                 <div>
                   <label className="mr-2" htmlFor="startDate">Wolne od:</label>
@@ -84,7 +99,7 @@ function Rooms() {
             </div>
             
             <div className="mb-1 flex flex-row p-1 bg-gray-300 rounded-md">
-              <input className="m-2" checked={filterCapacity} type="checkbox" onChange={() => setFilterCapacity(!filterCapacity)}></input>
+              <input className="m-2" checked={filterCapacity} type="checkbox" onChange={onFilterCapacityChange}></input>
               <div>
                 <label className="mr-2" htmlFor="minCapacity">Minimalna pojemność:</label>
                 <input className="w-12" id={"minCapacity"} disabled={!filterCapacity} type="number" value={minCapacity} onChange={onCapacityChange}></input>
@@ -92,15 +107,15 @@ function Rooms() {
             </div>
            
             <div className="mb-1 flex flex-row p-1 bg-gray-300 rounded-md">
-              <input className="m-2" id={"annotation"} checked={filterAnnotation} type="checkbox" onChange={() => setFilterAnnotation(!filterAnnotation)}></input>
+              <input className="m-2" id={"annotation"} checked={filterAnnotation} type="checkbox" onChange={onFilterAnnotationChange}></input>
               <div>
                 <label className="mr-2" htmlFor="annotation">Rodzaj</label>
-                <select value={annotation} disabled={!filterAnnotation} onChange={(event)=>{event.preventDefault();setAnnotation(event.target.value);}}>
-                  <option value="">      Brak</option>
-                  <option value="laboratoryjna">  Laboratoryjna</option>
-                  <option value="wykładowa">      Wykładowa</option>
-                  <option value="ćwiczeniowa">    Ćwiczeniowa</option>
-                  <option value="komputerowa">    Komputerowa</option>
+                <select value={annotation} disabled={!filterAnnotation} onChange={onAnnotationChange}>
+                  <option value=""              >Brak</option>
+                  <option value="laboratoryjna" >Laboratoryjna</option>
+                  <option value="wykładowa"     >Wykładowa</option>
+                  <option value="ćwiczeniowa"   >Ćwiczeniowa</option>
+                  <option value="komputerowa"   >Komputerowa</option>
                 </select>
               </div>
             </div>
