@@ -34,6 +34,11 @@ public class ActivityController {
         return activityService.getByRoomIdForNextWeek(roomId, startTime);
     }
 
+    @GetMapping("room/conflicts")
+    private ActivityConflict getConflictsFromAllRooms() throws ParseException {
+        return activityService.getConflictsAllRoom();
+    }
+
     @GetMapping("room/{id}/conflicts")
     private ActivityConflict getConflictsByRoomId(@PathVariable("id") int roomId) throws ParseException {
         return activityService.getConflictsRoom(roomId);

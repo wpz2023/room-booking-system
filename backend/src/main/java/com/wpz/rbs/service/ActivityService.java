@@ -2,7 +2,9 @@ package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Activity;
 import com.wpz.rbs.model.ActivityConflict;
+import com.wpz.rbs.model.Room;
 import com.wpz.rbs.repository.ActivityRepository;
+import com.wpz.rbs.repository.RoomRepository;
 import com.wpz.rbs.utils.StaticHelpers;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,11 @@ import java.util.List;
 public class ActivityService {
 
     private final ActivityRepository activityRepository;
+    private final RoomRepository roomRepository;
 
-    public ActivityService(ActivityRepository activityRepository) {
+    public ActivityService(ActivityRepository activityRepository, RoomRepository roomRepository) {
         this.activityRepository = activityRepository;
+        this.roomRepository = roomRepository;
     }
 
     public List<Activity> getAll() {
@@ -62,6 +66,15 @@ public class ActivityService {
 
     public Activity saveOrUpdate(Activity activity) {
         return activityRepository.save(activity);
+    }
+
+    public ActivityConflict getConflictsAllRoom() throws ParseException {
+        Iterable<Room> rooms = roomRepository.findAll();
+        for (Room room : rooms) {
+            ActivityConflict conflict = getConflictsRoom(room.getId());
+            if (conflict != null) return conflict;
+        }
+        return null;
     }
 
     public ActivityConflict getConflictsRoom(int roomId) throws ParseException {
