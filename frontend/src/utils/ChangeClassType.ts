@@ -1,25 +1,22 @@
-export function changeClasstypeName({
-  classType,
-}: {
-  classType: Map<string, string>;
-}) {
-  if (classType.get("pl") == "Wykład") {
+export function changeClasstypeName(classType: Map<string, string>) {
+  const type = classType.get("pl");
+  if (type == "Wykład") {
     classType.set("pl", "WYK");
-  } else if (classType.get("pl") == "Ćwiczenia") {
+  } else if (type == "Ćwiczenia") {
     classType.set("pl", "CW");
-  } else if (classType.get("pl") == "Konwersatorium") {
+  } else if (type == "Konwersatorium") {
     classType.set("pl", "KON");
-  } else if (classType.get("pl") == "Laboratorium") {
+  } else if (type == "Laboratorium") {
     classType.set("pl", "LAB");
-  } else if (classType.get("pl") == "Seminarium") {
+  } else if (type == "Seminarium") {
     classType.set("pl", "SEM");
-  } else if (classType.get("pl") == "Pracownia") {
+  } else if (type == "Pracownia") {
     classType.set("pl", "PRA");
-  } else if (classType.get("pl") == "Pracownia komputerowa") {
+  } else if (type == "Pracownia komputerowa") {
     classType.set("pl", "PKO");
-  } else if (classType.get("pl") == "Lektorat") {
+  } else if (type == "Lektorat") {
     classType.set("pl", "LEK");
-  } else if (classType.get("pl") == "Warsztat") {
+  } else if (type == "Warsztat") {
     classType.set("pl", "WAR");
   }
   return classType;

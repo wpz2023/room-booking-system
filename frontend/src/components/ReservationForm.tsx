@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 import Api from "../Api";
 import { BackgroundEvent } from "./Calendar";
@@ -57,14 +56,14 @@ function ReservationForm({
       }).then((res) => res.data);
       return data;
     },
-  });
-
-  useEffect(() => {
-    if (reserve?.isSuccess) {
+    onSuccess: () => {
       toast.success("Udało ci się stworzyć rezerwację!");
       reset();
-    }
-  }, [reserve?.isSuccess]);
+    },
+    onError: () => {
+      toast.info("Nie udało się stworzyć rezerwacji");
+    },
+  });
 
   const onSubmit = async (
     data: FormValues,

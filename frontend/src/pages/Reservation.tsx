@@ -5,10 +5,12 @@ import { ReservationData } from "../models/Activity";
 import Api from "../Api";
 import { getRoomInfo } from "../utils/GetRoomInfo";
 import { ReservationStatus } from "../utils/ReservationStatus";
+import { ToastContainer, toast } from "react-toastify";
 
 function Reservation() {
   const { id } = useParams();
   const [reservation, setReservation] = useState<ReservationData>();
+  const [reservationStatus, setReservationStatus] = useState(true);
   let token = window.sessionStorage.getItem("jwtToken");
 
   useEffect(() => {
@@ -21,6 +23,14 @@ function Reservation() {
 
     setReservation(reservationQuery.data);
   }, []);
+
+  useEffect(() => {
+    if (reservation?.status != "Otwarty") {
+      setReservationStatus(false);
+    } else {
+      setReservationStatus(true);
+    }
+  }, [reservation]);
 
   useEffect(() => {
     token = window.sessionStorage.getItem("jwtToken");
@@ -44,11 +54,11 @@ function Reservation() {
         })
         .then((res) => res.data),
     enabled: true,
-    onSuccess(data) {
+    onSuccess(data: ReservationData) {
       if (data != undefined) {
         data.status = ReservationStatus.get(data.status) as string;
+        setReservation(data);
       }
-      setReservation(data);
     },
   });
 
@@ -68,7 +78,12 @@ function Reservation() {
           },
         }
       );
+
       return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Rezerwacja została zatwierdzona");
+      reservationQuery.refetch();
     },
   });
 
@@ -85,20 +100,28 @@ function Reservation() {
       );
       return response.data;
     },
+    onSuccess: (data) => {
+      reservationQuery.refetch();
+      toast.success("Rezerwacja została odrzucona");
+    },
   });
 
   const handleDecline = () => {
     declineReservation.mutate(id as string);
-    reservationQuery.refetch();
   };
 
   const handleAccept = () => {
     acceptReservation.mutate(id as string);
-    reservationQuery.refetch();
+  };
+
+  const handleModify = () => {
+    acceptReservation.mutate(id as string);
+    toast.success("Rezerwacja została zatwierdzona");
   };
 
   return (
     <div className="mx-16 py-10">
+      <ToastContainer />
       <h1 className="text-3xl font-bold mb-4">Rezerwacja o numerze {id}</h1>
       <div className="flex flex-col items-center text-center w-full">
         <div className="m-4 flex flex-row justify-between">
@@ -139,7 +162,7 @@ function Reservation() {
             <div className="font-medium"> Status: &nbsp; </div>
             <div className=""> {reservation?.status}</div>
           </div>
-          {reservation?.status == "open" && (
+          {reservationStatus && (
             <div className="mt-6">
               <button
                 className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-md shadow-md mr-2 text-lg"

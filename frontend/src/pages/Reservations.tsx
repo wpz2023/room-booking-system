@@ -14,7 +14,6 @@ function Reservations() {
     reservationsQuery.refetch();
     if (reservationsQuery.data != undefined) {
       reservationsQuery.data?.forEach((reservation) => {
-        console.log(reservation.status);
         reservation.status = ReservationStatus.get(
           reservation.status
         ) as string;
@@ -56,8 +55,6 @@ function Reservations() {
   const handleClick = (id: string) => {
     navigate("/rezerwacja/" + id);
   };
-
-  console.log(reservations);
 
   return (
     <div className="container mx-auto py-10">
