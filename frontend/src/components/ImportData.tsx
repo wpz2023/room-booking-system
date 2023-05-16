@@ -22,7 +22,6 @@ function ImportData() {
   });
 
   useEffect(() => {
-    console.log("Room id: " + roomIndex)
     if (roomIndex >= 0 && roomIndex < data.length){
       setRoom({
         ...clickedRoom,
@@ -39,9 +38,7 @@ function ImportData() {
     if (activitiesToDelete.length > 0) {
       mutate(clickedRoom.id);
     } else {
-      console.log("wchodze")
-      if (roomIndex >= 0){
-        console.log("jestem")
+      if (roomIndex >= 0 && !popupVisible){
         setRoomIndex(roomIndex + 1)
       }
     }
@@ -49,7 +46,6 @@ function ImportData() {
 
   const { mutate, data: roomConflict } = useMutation<Conflict>(
     async (id) => {
-      console.log("mutate - " + roomIndex)
       const response = await Api.authApi.post(
         `activity/room/${id}/conflicts`,
         activitiesToDelete,
@@ -65,18 +61,19 @@ function ImportData() {
     {
       onSuccess: (responseData) => {
         if (responseData) {
-          console.log("popup - " + roomIndex)
           setPopupVisible(true);
         } else {
-          console.log("DONE - " + clickedRoom.id)
-          toast.success("Udało się zaimportować plan sali");
+          if(!allRoomsLoop){
+            toast.success("Udało się zaimportować plan sali");
+          } else if (roomIndex == data?.length-1){
+            toast.success("Udało się zaimportować plany wszystkich sal");
+          }
         }
       },
     }
   );
 
   const getRoomActivities = async () => {
-    console.log("getRoomActivities - " + roomIndex)
     if (clickedRoom.id != 0) {
       return await Api.authApi
         .get(`import/activity/${clickedRoom.id}`, {
@@ -155,7 +152,7 @@ function ImportData() {
         bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"
         onClick={handleClick}
       >
-        Importuj dane
+        Importuj sale
       </button>
       {isFetching ? (
         <p>Ładowanie danych</p>
@@ -176,8 +173,8 @@ function ImportData() {
                                     bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
                     Importuj plany wszystkich sal
                   </button>
-                  {isActivitiesFetching && allRoomsLoop && (
-                      <p className="pt-2 font-normal text-center">Importowanie planu</p>
+                  { allRoomsLoop && (
+                      <p className="pt-2 font-normal text-center">Importowanie planów</p>
                   )}
                 </div>
               </div>
