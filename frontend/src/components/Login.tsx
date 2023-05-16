@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Api from "../Api";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { AxiosError } from "axios";
+import {useMutation} from "@tanstack/react-query";
+import {useNavigate} from "react-router-dom";
+import {AxiosError} from "axios";
 
 function Login() {
   const navigate = useNavigate();
@@ -23,11 +23,10 @@ function Login() {
 
   const tokenMutation = useMutation({
     mutationFn: async () => {
-      const data = await Api.Api.post("auth/authenticate", {
+      return await Api.Api.post("auth/authenticate", {
         email: email,
         password: password,
       }).then((res) => res.data);
-      return data;
     },
     onError: (error: AxiosError) => {
       if (!error.response) {
@@ -47,7 +46,8 @@ function Login() {
       setEmail("");
       setPassword("");
       const path = sessionStorage.getItem("page") as string;
-      if (path != "") {
+      console.log(path)
+      if (path) {
         navigate(path, { replace: true });
         sessionStorage.setItem("page", "");
       } else {
