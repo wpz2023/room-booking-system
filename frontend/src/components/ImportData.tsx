@@ -149,10 +149,9 @@ function ImportData() {
       </div>
       <div className="w-[450px] flex flex-col items-center">
           <button
-              className="w-2/5 px-4 py-3 mb-14 transition hover:scale-110 delay-150 rounded-lg
-        bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"
               onClick={handleClick}
-          >
+              className="w-2/5 px-4 py-3 mb-14 transition hover:scale-110 delay-150 rounded-lg
+                bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
               Importuj sale
           </button>
       </div>
