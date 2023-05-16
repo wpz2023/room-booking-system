@@ -9,6 +9,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,19 +30,21 @@ public class RoomService {
         exampleRoom.setRoomAnnotation(RoomAnnotation.getByAnnotation(annotation));
 
         List<Room> rooms = new ArrayList<>();
-        roomRepository.findAll(Example.of(exampleRoom)).forEach( (room) -> {
-            if(capacityMin != null){
-                if(room.getCapacity() < capacityMin) return;
+        roomRepository.findAll(Example.of(exampleRoom)).forEach((room) -> {
+            if (capacityMin != null) {
+                if (room.getCapacity() < capacityMin) return;
             }
 
-            if(startTime != null && endTime != null){
+            if (startTime != null && endTime != null) {
                 var activities = activityRepository.findAllByRoomIdAndOverlappingStartTimeAndEndTime(room.getId(), startTime, endTime);
-                if(activities.size() != 0) return;
+                if (activities.size() != 0) return;
             }
 
             rooms.add(room);
         });
-        return rooms;
+        return rooms.stream()
+                .sorted(Comparator.comparing(Room::getNumber))
+                .toList();
     }
 
     public Room getById(int id) {

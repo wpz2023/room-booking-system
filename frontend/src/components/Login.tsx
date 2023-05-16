@@ -46,7 +46,6 @@ function Login() {
       setEmail("");
       setPassword("");
       const path = sessionStorage.getItem("page") as string;
-      console.log(path)
       if (path) {
         navigate(path, { replace: true });
         sessionStorage.setItem("page", "");

@@ -175,7 +175,7 @@ function ImportData() {
         <p>Ładowanie danych</p>
       ) : (
         <div>
-          {data && (
+          {data?.length>0 && (
             <div>
               <div className="flex flex-col items-center mb-3">
                 <button
