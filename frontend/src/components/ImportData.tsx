@@ -99,6 +99,19 @@ function ImportData() {
     refetchRoomActivities();
   }, [selectedRoom]);
 
+  const getRooms = () => {
+    return Api.Api.get("room")
+        .then((res) => res.data);
+  };
+
+  const { data: roomsData } = useQuery<RoomData[]>(
+      ["roomsData"],
+      getRooms,
+      {
+        refetchOnWindowFocus: false,
+      }
+  );
+
   const getImportRooms = () => {
     return Api.authApi
       .get("import/room", {
@@ -109,14 +122,16 @@ function ImportData() {
       .then((res) => res.data);
   };
 
-  const { isFetching, data, refetch } = useQuery<RoomData[]>(
-    ["data"],
+  const { isFetching, data: importRoomsData, refetch } = useQuery<RoomData[]>(
+    ["importRoomsData"],
     getImportRooms,
     {
       refetchOnWindowFocus: false,
       enabled: false,
     }
   );
+
+  const data = importRoomsData || roomsData
 
   const handleClick = () => {
     refetch();
