@@ -162,19 +162,19 @@ function ImportData() {
         <div>
           {data && (
             <div>
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center mb-3">
                 <button
                     onClick={importAllRoomsActivities}
                     disabled={isActivitiesFetching}
                     style={{
                       cursor: isActivitiesFetching ? "wait" : "pointer",
                     }}
-                    className="px-4 py-2 mb-5 w-2/5 transition hover:scale-110 delay-150 rounded-lg
+                    className="px-4 py-2 mb-3 w-2/5 transition hover:scale-110 delay-150 rounded-lg
                          bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
                   Importuj plany wszystkich sal
                 </button>
                 { isImportLoop && (
-                    <p className="pt-2 mb-2 font-normal text-center">Importowanie planów</p>
+                    <p className="mb-2 font-normal text-center">Importowanie planów</p>
                 )}
               </div>
 
@@ -206,7 +206,7 @@ function ImportData() {
                       Importuj plan
                     </button>
                     {isActivitiesFetching && selectedRoom.id == room.id && !isImportLoop && (
-                      <p className="pt-2 font-normal">Importowanie planu</p>
+                      <p className="font-normal">Importowanie planu</p>
                     )}
                   </div>
                 </div>
