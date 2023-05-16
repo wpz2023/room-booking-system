@@ -159,29 +159,27 @@ function ImportData() {
       ) : (
         <div>
           {data && (
-            <div className="w-[450px] px-6">
+            <div className="w-[450px] px-6 flex flex-col">
               <div className="flex flex-row items-end">
                 <p className="basis-3/5 font-medium">Numer sali</p>
-                <div className="basis-2/5 flex flex-col">
-                  <button
-                      onClick={importAllRoomsActivities}
-                      disabled={isActivitiesFetching}
-                      style={{
-                        cursor: isActivitiesFetching ? "wait" : "pointer",
-                      }}
-                      className="px-4 py-2 transition hover:scale-110 delay-150 rounded-lg
-                                 bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
-                    Importuj plany wszystkich sal
-                  </button>
-                  { isImportLoop && (
-                      <p className="pt-2 font-normal text-center">Importowanie planów</p>
-                  )}
-                </div>
               </div>
               <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
+              <button
+                  onClick={importAllRoomsActivities}
+                  disabled={isActivitiesFetching}
+                  style={{
+                    cursor: isActivitiesFetching ? "wait" : "pointer",
+                  }}
+                  className="px-4 py-2 transition hover:scale-110 delay-150 rounded-lg
+                         bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
+                Importuj plany wszystkich sal
+              </button>
+              { isImportLoop && (
+                  <p className="pt-2 mb-2 font-normal text-center">Importowanie planów</p>
+              )}
             </div>
           )}
-          <ul role="list" className="w-full p-6 divide-y divide-slate-200">
+          <ul role="list" className="w-full p-6 divide-y divide-slate-200 mt-2 ">
             {data?.map((room) => (
               <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                 <div className="flex text-center items-center">
