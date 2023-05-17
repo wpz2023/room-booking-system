@@ -92,13 +92,17 @@ function Room() {
                 {"@media print \
                 {\
                    @page { size: A3 landscape; } \
-                  .rbc-btn-group { display: none !important; }\
-                  .rbc-today { background-color: transparent; }\
-                  .rbc-current-time-indicator { display: none !important; }\
-                  .rbc-day-slot .rbc-background-event { display: none !important; }\
-                  .rbc-timeslot-group { min-height: 30px; }\
+                   #classNumberToPrint { visibility: visible !important; } \
+                   .rbc-btn-group { display: none !important; }\
+                   .rbc-today { background-color: transparent; }\
+                   .rbc-current-time-indicator { display: none !important; }\
+                   .rbc-day-slot .rbc-background-event { display: none !important; }\
+                   .rbc-timeslot-group { min-height: 30px; }\
                 }"}
             </style>
+            <p id={"classNumberToPrint"} className="text-4xl text-center font-bold" style={{visibility: "hidden"}}>
+                Sala: {room?.number}
+            </p>
             <NewCalendar
                 activities={roomActivities}
                 defaultView={Views.WEEK}
@@ -155,7 +159,7 @@ function Room() {
         <div>
             {isRoomActivitiesFetching ? (<div className="mt-8 text-center">Ładowanie danych...</div>) : (<div>
                 <div className="flex flex-col my-8">
-                    <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
+                    <hr className="h-px bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                     <div>
                         <CalendarToPrint ref={calendarRef}/>
                         <ReactToPrint
