@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react';
-import MaterialReactTable, { type MRT_ColumnDef } from 'material-react-table';
+import MaterialReactTable from 'material-react-table';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
 
@@ -40,9 +39,9 @@ function ReservationsTable({data}: any) {
           accessorFn: (row: any) =>{
             const val = row.status;
             switch(val){ 
-              case "open": return "Otwarta"; break;
-              case "accepted": return "Zaakceptowana"; break;
-              case "declined": return "Odrzucona"; break;
+              case "open": return "Otwarta";
+              case "accepted": return "Zaakceptowana";
+              case "declined": return "Odrzucona";
             }
           },
           accessorKey: 'status',
