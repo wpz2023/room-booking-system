@@ -6,11 +6,13 @@ import Api from "../Api";
 import { getRoomInfo } from "../utils/GetRoomInfo";
 import { ReservationStatus } from "../utils/ReservationStatus";
 import { ToastContainer, toast } from "react-toastify";
+import ModifyReservationModal from "../components/ModifyReservationModal";
 
 function Reservation() {
   const { id } = useParams();
   const [reservation, setReservation] = useState<ReservationData>();
   const [reservationStatus, setReservationStatus] = useState(true);
+  const [popupVisible, setPopupVisible] = useState(false);
   let token = window.sessionStorage.getItem("jwtToken");
 
   useEffect(() => {
@@ -67,11 +69,17 @@ function Reservation() {
     !!reservation?.room_id
   );
 
-  const acceptReservation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await Api.authApi.post(
+  const modifyReservation = useMutation({
+    mutationFn: async ({
+      id,
+      reservation,
+    }: {
+      id: string;
+      reservation: ReservationData;
+    }) => {
+      const response = await Api.authApi.put(
         `reservation/manage/${id}/accept`,
-        {},
+        { reservation },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -82,8 +90,7 @@ function Reservation() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Rezerwacja została zatwierdzona");
-      reservationQuery.refetch();
+      acceptReservation.mutate(id as string);
     },
   });
 
@@ -106,6 +113,25 @@ function Reservation() {
     },
   });
 
+  const acceptReservation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await Api.authApi.post(
+        `reservation/manage/${id}/accept`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      reservationQuery.refetch();
+      toast.success("Rezerwacja została potwierdzona!");
+    },
+  });
+
   const handleDecline = () => {
     declineReservation.mutate(id as string);
   };
@@ -114,9 +140,12 @@ function Reservation() {
     acceptReservation.mutate(id as string);
   };
 
-  const handleModify = () => {
-    acceptReservation.mutate(id as string);
-    toast.success("Rezerwacja została zatwierdzona");
+  const handleModification = () => {
+    // modifyReservation.mutate({
+    //   id: id as string,
+    //   reservation: reservation as ReservationData,
+    // });
+    setPopupVisible(true);
   };
 
   return (
@@ -171,6 +200,12 @@ function Reservation() {
                 Odrzuć
               </button>
               <button
+                className="px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md shadow-md mr-2 text-lg"
+                onClick={handleModification}
+              >
+                Modyfikuj
+              </button>
+              <button
                 className="px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-md shadow-md text-lg"
                 onClick={handleAccept}
               >
@@ -180,6 +215,9 @@ function Reservation() {
           )}
         </div>
       </div>
+      {popupVisible && (
+        <ModifyReservationModal onClose={() => setPopupVisible(false)} />
+      )}
     </div>
   );
 }
