@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import MaterialReactTable, { type MRT_ColumnDef } from 'material-react-table';
+import { MRT_Localization_PL } from 'material-react-table/locales/pl';
+
 
 function ReservationsTable({data}: any) {
   
@@ -46,6 +48,7 @@ function ReservationsTable({data}: any) {
       enableColumnFilters
       enableColumnResizing 
       enableFilters
+      localization={MRT_Localization_PL}
     />
   );
 };
