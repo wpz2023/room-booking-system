@@ -27,13 +27,11 @@ function Reservations() {
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-5">Lista rezerwacji</h1>
       <div className="overflow-x-auto">
-  
         {reservations.isFetching ? (
-            <div className="">Ładowanie...</div>
-          ) : (
-            <ReservationsTable data={reservations.data} />
+          <div className="">Ładowanie...</div>
+        ) : (
+          <ReservationsTable data={reservations.data} />
         )}
-
       </div>
     </div>
   );
