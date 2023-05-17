@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { RoomAnnotation, RoomData } from "../models/Room";
+import { RoomData } from "../models/Room";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Api from "../Api";
 import ConflictPopUp from "../components/ConflictPopUp";
@@ -13,7 +13,7 @@ function ImportData() {
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
   const [clickedRoom, setRoom] = useState<RoomData>({
     capacity: 0,
-    roomAnnotation: RoomAnnotation.EMPTY,
+    roomAnnotation: undefined,
     type: "",
     id: 0,
     number: 0,
@@ -64,11 +64,13 @@ function ImportData() {
     return null;
   };
 
-  const { isFetching: isActivitiesFetching, refetch: refetchRoomActivities } =
-    useQuery(["roomActivities"], getRoomActivities, {
-      refetchOnWindowFocus: false,
-      enabled: false,
-    });
+  const {
+    isFetching: isActivitiesFetching,
+    refetch: refetchRoomActivities,
+  } = useQuery(["roomActivities"], getRoomActivities, {
+    refetchOnWindowFocus: false,
+    enabled: false,
+  });
 
   useEffect(() => {
     refetchRoomActivities();
@@ -97,12 +99,12 @@ function ImportData() {
     refetch();
   };
 
-  const onButtonClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onButtonClick = (e) => {
     e.preventDefault();
     setRoom({
       ...clickedRoom,
-      id: Number(e.currentTarget.dataset.value1),
-      number: Number(e.currentTarget.dataset.value2),
+      id: e.currentTarget.dataset.value1,
+      number: e.currentTarget.dataset.value2,
     });
   };
 
@@ -130,7 +132,7 @@ function ImportData() {
           {data && (
             <div className="w-[450px] px-6">
               <p className="font-medium">Numer sali</p>
-              <hr className="my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
+              <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
             </div>
           )}
           <ul role="list" className="w-full p-6 divide-y divide-slate-200">
@@ -142,7 +144,7 @@ function ImportData() {
                     <button
                       data-value1={room.id}
                       data-value2={room.number}
-                      onClick={(e) => onButtonClick(e)}
+                      onClick={onButtonClick}
                       disabled={isActivitiesFetching}
                       style={{
                         cursor: isActivitiesFetching ? "wait" : "pointer",
