@@ -7,3 +7,8 @@ export function parseStringToUTC(dateString: string | undefined) {
   const date = new Date(dateString as string);
   return date;
 }
+
+export function parseDateFromDB(dateString: string | undefined) {
+  const date = new Date(dateString as string);
+  return date;
+}

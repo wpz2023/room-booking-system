@@ -1,12 +1,12 @@
 import { changeClasstypeName } from "./ChangeClassType";
 import { Activity } from "../models/Activity";
-import { parseStringToUTC } from "./ParseDate";
+import { parseDateFromDB } from "./ParseDate";
 
 export function mapActivitiesToEvents(activities: Activity[]) {
   return activities?.map((activity) => ({
     ...activity,
-    start: new Date(parseStringToUTC(activity.start_time)),
-    end: new Date(parseStringToUTC(activity.end_time)),
+    start: new Date(parseDateFromDB(activity.start_time)),
+    end: new Date(parseDateFromDB(activity.end_time)),
     course_name: activity.course_name,
     classtype_name: changeClasstypeName(
       new Map(Object.entries(activity.classtype_name))

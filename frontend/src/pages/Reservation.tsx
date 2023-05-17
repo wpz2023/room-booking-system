@@ -1,18 +1,21 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ReservationData, NewReservation } from "../models/Reservation";
+import { ReservationData } from "../models/Reservation";
 import Api from "../Api";
 import { getRoomInfo } from "../utils/GetRoomInfo";
 import { ReservationStatus } from "../utils/ReservationStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ModifyReservationModal from "../components/ModifyReservationModal";
+import { parseDateFromUTC } from "../utils/ParseDate";
 
 function Reservation() {
   const { id } = useParams();
+  const [roomId, setRoomId] = useState<number | undefined>();
   const [reservation, setReservation] = useState<ReservationData>();
   const [reservationStatus, setReservationStatus] = useState(true);
   const [popupVisible, setPopupVisible] = useState(false);
+
   let token = window.sessionStorage.getItem("jwtToken");
 
   useEffect(() => {
@@ -32,6 +35,7 @@ function Reservation() {
     } else {
       setReservationStatus(true);
     }
+    setRoomId(reservation?.room_id);
   }, [reservation]);
 
   useEffect(() => {
@@ -47,8 +51,8 @@ function Reservation() {
 
   const reservationQuery = useQuery<ReservationData>({
     queryKey: ["reservation"],
-    queryFn: () =>
-      Api.authApi
+    queryFn: async () =>
+      await Api.authApi
         .get("reservation/manage/" + id, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,14 +64,12 @@ function Reservation() {
       if (data != undefined) {
         data.status = ReservationStatus.get(data.status) as string;
         setReservation(data);
+        setRoomId(data.room_id);
       }
     },
   });
 
-  const room = getRoomInfo(
-    reservation?.room_id.toString(),
-    !!reservation?.room_id
-  );
+  const room = getRoomInfo(roomId?.toString(), roomId != undefined);
 
   const modifyReservation = useMutation({
     mutationFn: async ({
@@ -84,8 +86,10 @@ function Reservation() {
           email: reservation.email,
           first_name: reservation.first_name,
           last_name: reservation.last_name,
-          start_time: reservation.start_time,
-          end_time: reservation.end_time,
+          start_time: parseDateFromUTC(
+            new Date(reservation.start_time)
+          ) as string,
+          end_time: parseDateFromUTC(new Date(reservation.end_time)) as string,
           room_id: reservation.room_id,
         },
         {
@@ -97,8 +101,10 @@ function Reservation() {
 
       return response.data;
     },
-    onSuccess: () => {
-      acceptReservation.mutate(id as string);
+    onSuccess: async () => {
+      await reservationQuery.refetch();
+      await room.refetch();
+      toast.success("Rezerwacja została zmodyfikowana!");
     },
   });
 
@@ -115,8 +121,8 @@ function Reservation() {
       );
       return response.data;
     },
-    onSuccess: (data) => {
-      reservationQuery.refetch();
+    onSuccess: async (data) => {
+      await reservationQuery.refetch();
       toast.success("Rezerwacja została odrzucona");
     },
   });
@@ -134,8 +140,8 @@ function Reservation() {
       );
       return response.data;
     },
-    onSuccess: (data) => {
-      reservationQuery.refetch();
+    onSuccess: async (data) => {
+      await reservationQuery.refetch();
       toast.success("Rezerwacja została potwierdzona!");
     },
   });
@@ -149,10 +155,12 @@ function Reservation() {
   };
 
   const modify = (newReservation: ReservationData) => {
+    setRoomId(newReservation.room_id);
     modifyReservation.mutate({
       id: newReservation.id,
       reservation: newReservation,
     });
+    room.refetch();
     setPopupVisible(false);
   };
 
