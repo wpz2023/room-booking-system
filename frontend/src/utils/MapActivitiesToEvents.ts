@@ -1,23 +1,12 @@
 import { changeClasstypeName } from "./ChangeClassType";
 import { Activity } from "../models/Activity";
+import { parseStringToUTC } from "./ParseDate";
 
 export function mapActivitiesToEvents(activities: Activity[]) {
   return activities?.map((activity) => ({
     ...activity,
-    start: new Date(
-      Number(activity.start_time.substring(0, 4)), //year
-      Number(activity.start_time.substring(5, 7)) - 1, // month
-      Number(activity.start_time.substring(8, 10)), // day
-      Number(activity.start_time.substring(11, 13)), // hour
-      Number(activity.start_time.substring(14, 16)) // minute
-    ),
-    end: new Date(
-      Number(activity.end_time.substring(0, 4)), //year
-      Number(activity.end_time.substring(5, 7)) - 1, // month
-      Number(activity.end_time.substring(8, 10)), // day
-      Number(activity.end_time.substring(11, 13)), // hour
-      Number(activity.end_time.substring(14, 16)) // minute
-    ),
+    start: new Date(parseStringToUTC(activity.start_time)),
+    end: new Date(parseStringToUTC(activity.end_time)),
     course_name: activity.course_name,
     classtype_name: changeClasstypeName(
       new Map(Object.entries(activity.classtype_name))
