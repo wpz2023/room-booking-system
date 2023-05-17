@@ -7,12 +7,12 @@ function ReservationsTable({data}: any) {
   
   const columns = [
         {
-          accessorKey: 'id',
-          header: 'ID',
-          size: 80,
+          header: '',
+          id: 'Details',
+          size: 120,
           Cell: ({ renderedCellValue, row }: {renderedCellValue: any, row: any}) => (
             <a href={`/rezerwacja/${row.id}`}>
-              <span>{renderedCellValue}</span>
+              <span>Szczegóły</span>
             </a>
           )
         },
@@ -33,10 +33,18 @@ function ReservationsTable({data}: any) {
           header: 'Czas Zakończenia',
         },
         {
+          accessorFn: (row: any) =>{
+            const val = row.status;
+            switch(val){ 
+              case "open": return "Otwarta"; break;
+              case "accepted": return "Zaakceptowana"; break;
+              case "declined": return "Odrzucona"; break;
+            }
+          },
           accessorKey: 'status',
           header: 'Status',
           filterVariant: "select",
-          filterSelectOptions: ["open", "accepted", "declined"],
+          filterSelectOptions: ["Otwarta", "Zaakceptowana", "Odrzucona"],
           size: 120
         }
   ];
