@@ -59,7 +59,7 @@ function Room() {
 
   // przechowuje eventy do wyświetlenia w kalendarzu
   const roomActivities = mapActivitiesToEvents(activities as Activity[]);
-
+  console.log(roomActivities[1]);
   const pushNewRoomAnnotation = useMutation((newAnnotation) => {
     const roomData = {
       roomAnnotation: newAnnotation,

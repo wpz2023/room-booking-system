@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Api from "../Api";
-import { ReservationData } from "../models/Activity";
+import { ReservationData } from "../models/Reservation";
 import { useNavigate } from "react-router-dom";
 import { ReservationStatus } from "../utils/ReservationStatus";
 

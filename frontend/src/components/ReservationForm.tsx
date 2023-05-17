@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 import Api from "../Api";
 import { BackgroundEvent } from "./Calendar";
-import { parseDate } from "../utils/ParseDate";
+import { parseDateFromUTC } from "../utils/ParseDate";
 
 type FormValues = {
   name: string;
@@ -74,8 +74,8 @@ function ReservationForm({
       setCalendarWarning(false);
     } else {
       setCalendarWarning(true);
-      const start = parseDate(event?.start) as string;
-      const end = parseDate(event?.end) as string;
+      const start = parseDateFromUTC(event?.start) as string;
+      const end = parseDateFromUTC(event?.end) as string;
 
       await reserve.mutate({ formValues: data, start, end });
     }

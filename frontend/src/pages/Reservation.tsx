@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ReservationData } from "../models/Activity";
+import { ReservationData, NewReservation } from "../models/Reservation";
 import Api from "../Api";
 import { getRoomInfo } from "../utils/GetRoomInfo";
 import { ReservationStatus } from "../utils/ReservationStatus";
@@ -78,8 +78,16 @@ function Reservation() {
       reservation: ReservationData;
     }) => {
       const response = await Api.authApi.put(
-        `reservation/manage/${id}/accept`,
-        { reservation },
+        `reservation/manage/${id}`,
+        {
+          name: reservation.name,
+          email: reservation.email,
+          first_name: reservation.first_name,
+          last_name: reservation.last_name,
+          start_time: reservation.start_time,
+          end_time: reservation.end_time,
+          room_id: reservation.room_id,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,11 +148,15 @@ function Reservation() {
     acceptReservation.mutate(id as string);
   };
 
+  const modify = (newReservation: ReservationData) => {
+    modifyReservation.mutate({
+      id: newReservation.id,
+      reservation: newReservation,
+    });
+    setPopupVisible(false);
+  };
+
   const handleModification = () => {
-    // modifyReservation.mutate({
-    //   id: id as string,
-    //   reservation: reservation as ReservationData,
-    // });
     setPopupVisible(true);
   };
 
@@ -216,7 +228,11 @@ function Reservation() {
         </div>
       </div>
       {popupVisible && (
-        <ModifyReservationModal onClose={() => setPopupVisible(false)} />
+        <ModifyReservationModal
+          onClose={() => setPopupVisible(false)}
+          reservation={reservation as ReservationData}
+          modify={modify}
+        />
       )}
     </div>
   );
