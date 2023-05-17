@@ -1,13 +1,13 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Rooms from "./components/Rooms";
-import Reservation from "./components/Reservation";
-import ImportData from "./components/ImportData";
-import Login from "./components/Login";
-import Room from "./components/Room";
+import Rooms from "./pages/Rooms";
+import Reservation from "./pages/Reservation";
+import ImportData from "./pages/ImportData";
+import Login from "./pages/Login";
+import Room from "./pages/Room";
 import AuthRoute from "./AuthRoute";
 import Api from "./Api";
-import Reservations from "./components/Reservations";
+import Reservations from "./pages/Reservations";
 
 function AxiosInterceptorNavigate() {
   let navigate = useNavigate();

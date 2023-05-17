@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 import Api from "../Api";
 import { BackgroundEvent } from "./Calendar";
-import { parseDate } from "../utils/ParseDate";
+import { parseDateFromUTC } from "../utils/ParseDate";
 
 type FormValues = {
   name: string;
@@ -57,14 +56,14 @@ function ReservationForm({
       }).then((res) => res.data);
       return data;
     },
-  });
-
-  useEffect(() => {
-    if (reserve?.isSuccess) {
+    onSuccess: () => {
       toast.success("Udało ci się stworzyć rezerwację!");
       reset();
-    }
-  }, [reserve?.isSuccess]);
+    },
+    onError: () => {
+      toast.info("Nie udało się stworzyć rezerwacji");
+    },
+  });
 
   const onSubmit = async (
     data: FormValues,
@@ -75,8 +74,8 @@ function ReservationForm({
       setCalendarWarning(false);
     } else {
       setCalendarWarning(true);
-      const start = parseDate(event?.start) as string;
-      const end = parseDate(event?.end) as string;
+      const start = parseDateFromUTC(event?.start) as string;
+      const end = parseDateFromUTC(event?.end) as string;
 
       await reserve.mutate({ formValues: data, start, end });
     }

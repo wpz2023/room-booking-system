@@ -10,7 +10,7 @@ function ReservationsTable({data}: any) {
           id: 'Details',
           size: 120,
           Cell: ({ renderedCellValue, row }: {renderedCellValue: any, row: any}) => (
-            <a href={`/rezerwacja/${row.id}`} className="bg-gray-300 p-0.5 rounded-md transition hover:bg-gray-400 hover:scale-120" >
+            <a href={`/rezerwacja/${row.original.id}`} className="bg-gray-300 p-0.5 rounded-md transition hover:bg-gray-400 hover:scale-120" >
               <span>Szczegóły</span>
             </a>
           )
