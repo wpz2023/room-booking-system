@@ -1,0 +1,13 @@
+.rbc-time-view .rbc-allday-cell {
+    display: none;
+}
+
+.center-with-margin {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.hide-navigation .rbc-btn-group {
+    display: none !important;
+}

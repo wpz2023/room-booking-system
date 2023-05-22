@@ -11,6 +11,8 @@ import {Views} from "react-big-calendar";
 import {mapActivitiesToEvents} from "../utils/MapActivitiesToEvents";
 import ReservationForm from "./ReservationForm";
 import ReactToPrint from "react-to-print";
+import "./styles/Room.css"
+import Calendar from 'react-calendar';
 
 function Room() {
     const {id} = useParams();
@@ -86,41 +88,104 @@ function Room() {
         });
     };
 
-    const CalendarToPrint = React.forwardRef((props, ref) => {
+    const calendarRef = useRef();
+
+    const CalendarToPrint = React.forwardRef((props: any, ref) => {
+        let calendarsCount = 1;
+        let startDate: Date = smallCalendarValues[0];
+        let endDate: Date = smallCalendarValues[1];
+        const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
+
+        const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
+
+        if (datesSelected) {
+            calendarsCount = Math.ceil((endDate.getTime() - startDate.getTime()) / oneWeekTime);
+            if ((startDate.getDay() > endDate.getDay() && endDate.getDay() !== 0) || (startDate.getDay() === 0 && endDate.getDay() !== 0)) {
+                calendarsCount++;
+            }
+        }
+
+        let calendars = [];
+        for (let i = 0; i < calendarsCount; i++) {
+            calendars.push(<div className="hide-navigation" style={{breakInside: "avoid", pageBreakInside: "avoid"}}>
+                <p id={"classNumberToPrint"} className="text-4xl text-center font-bold"
+                   style={{visibility: "hidden"}}>
+                    Sala: {room?.number}
+                </p>
+                <NewCalendar
+                    activities={roomActivities}
+                    defaultView={Views.WEEK}
+                    views={[Views.WEEK]}
+                    minDate={new Date(0, 0, 0, 6, 0, 0)}
+                    maxDate={new Date(0, 0, 0, 22, 0, 0)}
+                    toolbar={true}
+                    step={15}
+                    backgroundEvent={backgroundEvent}
+                    handleSelectSlot={handleSelectSlot}
+                    selectable={!datesSelected}
+                    defaultDate={!datesSelected ? undefined : new Date(startDate.getTime() + oneWeekTime * i)}
+                />
+            </div>);
+        }
+
         return (<div ref={ref}>
             <style type="text/css" media="print">
                 {"@media print \
                 {\
-                   @page { size: A3 landscape; } \
-                   #classNumberToPrint { visibility: visible !important; } \
+                   @page { size: A3 landscape; }\
+                   #classNumberToPrint { visibility: visible !important; }\
                    .rbc-btn-group { display: none !important; }\
                    .rbc-today { background-color: transparent; }\
                    .rbc-current-time-indicator { display: none !important; }\
                    .rbc-day-slot .rbc-background-event { display: none !important; }\
                    .rbc-timeslot-group { min-height: 30px; }\
-                }"}
+                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }" +
+                    (cbxDeleteOthersChecked ?
+                        "#classNumberToPrint { display: none; }\ .rbc-toolbar { display: none !important; }}" :
+                        "") +
+                    (cbxDeleteDateChecked ?
+                        ".rbc-time-header-content { display: none; }" :
+                        "") +
+                    "\ }"
+                }
             </style>
-            <p id={"classNumberToPrint"} className="text-4xl text-center font-bold" style={{visibility: "hidden"}}>
-                Sala: {room?.number}
-            </p>
-            <NewCalendar
-                activities={roomActivities}
-                defaultView={Views.WEEK}
-                views={[Views.WEEK]}
-                minDate={new Date(0, 0, 0, 6, 0, 0)}
-                maxDate={new Date(0, 0, 0, 22, 0, 0)}
-                toolbar={true}
-                step={15}
-                backgroundEvent={backgroundEvent}
-                handleSelectSlot={handleSelectSlot}
-                selectable={true}
-                ref={calendarRef}
-                style={{breakInside: "avoid", pageBreakInside: "avoid"}}
-            />
+            <div>
+                {calendars}
+            </div>
         </div>);
     });
 
-    const calendarRef = useRef();
+    const [cbxDeleteOthersChecked, setCbxDeleteOthersChecked] = React.useState(false);
+    const cbxDeleteOthersChanged = () => {
+        setCbxDeleteOthersChecked(!cbxDeleteOthersChecked);
+    };
+
+    const [cbxDeleteDateChecked, setCbxDeleteDateChecked] = React.useState(false);
+    const cbxDeleteDateChanged = () => {
+        setCbxDeleteDateChecked(!cbxDeleteDateChecked);
+    };
+
+    const [cbxSelectDateChecked, setCbxSelectDateChecked] = React.useState(false);
+    const cbxSelectDateChanged = () => {
+        setCbxSelectDateChecked(!cbxSelectDateChecked);
+    };
+
+    const Checkbox = ({label, value, onChange}) => {
+        return (
+            <label>
+                <input type="checkbox" checked={value} onChange={onChange}/>
+                {label}
+            </label>
+        );
+    };
+
+    const [smallCalendarValues, setSmallCalendarValues] = useState([new Date(), new Date()]);
+    const smallCalendarChanged = (value: React.SetStateAction<Date[]>, _: any) => {
+        setSmallCalendarValues(value);
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        })
+    }
 
     return (<div className=" mx-16 py-10">
         <div className="flex flex-col items-center text-center">
@@ -162,21 +227,58 @@ function Room() {
                     <hr className="h-px bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                     <div>
                         <CalendarToPrint ref={calendarRef}/>
+
                         <ReactToPrint
                             trigger={
-                                () => <div style={{marginTop: "15px", display: "flex", justifyContent: "center"}}>
-                                    <button
-                                        className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
-                                        Wydrukuj plan
-                                    </button>
-                                </div>
+                                () =>
+                                    <div className="center-with-margin">
+                                        <button
+                                            className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
+                                            Wydrukuj plan
+                                        </button>
+                                    </div>
                             }
                             content={() => calendarRef.current}
+                            onAfterPrint={() => {
+                                setCbxSelectDateChecked(false);
+                                window.scrollTo(0, 0);
+                            }
+                            }
                         />
+                        <div className="center-with-margin">
+                            <Checkbox
+                                label="Usuń nagłówki dat"
+                                value={cbxDeleteDateChecked}
+                                onChange={cbxDeleteDateChanged}
+                            />
+                            <a style={{paddingLeft: "10px", paddingRight: "10px"}}></a>
+                            <Checkbox
+                                label="Usuń przedział dat i nr sali"
+                                value={cbxDeleteOthersChecked}
+                                onChange={cbxDeleteOthersChanged}
+                            />
+                            <a style={{paddingLeft: "10px", paddingRight: "10px"}}></a>
+                            <Checkbox
+                                label="Wybierz przedział dat"
+                                value={cbxSelectDateChecked}
+                                onChange={cbxSelectDateChanged}
+                            />
+                        </div>
+                        {cbxSelectDateChecked ? (
+                                <div className="center-with-margin">
+                                    <Calendar
+                                        onChange={smallCalendarChanged}
+                                        value={smallCalendarValues}
+                                        selectRange={true}
+                                    />
+                                </div>) :
+                            null}
                     </div>
-                    <div>
-                        <ReservationForm roomId={id} event={backgroundEvent}/>
-                    </div>
+                    {!cbxSelectDateChecked ? (
+                        <div>
+                            <ReservationForm roomId={id} event={backgroundEvent}/>
+                        </div>
+                    ) : null}
                 </div>
             </div>)}
         </div>

@@ -141,7 +141,7 @@ function ReservationForm({
               </label>
               <input
                 className="rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium  outline-none focus:border-sky-500 focus:shadow-md"
-                placeholder={"imie"}
+                placeholder={"Imię"}
                 type="text"
                 id="firsName"
                 {...register("firstName", {
@@ -159,7 +159,7 @@ function ReservationForm({
               </label>
               <input
                 className="rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium  outline-none focus:border-sky-500 focus:shadow-md"
-                placeholder={"nazwisko"}
+                placeholder={"Nazwisko"}
                 type="text"
                 id="lastName"
                 {...register("lastName", {
