@@ -73,6 +73,7 @@ function NewCalendar({
   backgroundEvent,
   handleSelectSlot,
   selectable,
+  countOfDays
 }: {
   activities: EventData[];
   backgroundEvent: BackgroundEvent | undefined;
@@ -124,6 +125,7 @@ function NewCalendar({
       style={{ height: "full" }}
       min={minDate}
       max={maxDate}
+      countOfDays={countOfDays ? countOfDays - 1 : null}
       messages={{
         allDay: "Cały dzień",
         previous: "Poprzedni",

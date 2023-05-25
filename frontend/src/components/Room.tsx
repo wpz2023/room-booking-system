@@ -4,7 +4,6 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {RoomAnnotation, RoomData} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
-import "moment/locale/pl";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import NewCalendar, {BackgroundEvent} from "./Calendar";
 import {Views} from "react-big-calendar";
@@ -13,6 +12,8 @@ import ReservationForm from "./ReservationForm";
 import ReactToPrint from "react-to-print";
 import "./styles/Room.css"
 import Calendar from 'react-calendar';
+import CustomWeekView from "../utils/CustomWeekView";
+import {countDaysLeftInWeek} from "../utils/CountDaysLeftInWeek";
 
 function Room() {
     const {id} = useParams();
@@ -88,73 +89,6 @@ function Room() {
         });
     };
 
-    const calendarRef = useRef();
-
-    const CalendarToPrint = React.forwardRef((props: any, ref) => {
-        let calendarsCount = 1;
-        let startDate: Date = smallCalendarValues[0];
-        let endDate: Date = smallCalendarValues[1];
-        const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
-
-        const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
-
-        if (datesSelected) {
-            calendarsCount = Math.ceil((endDate.getTime() - startDate.getTime()) / oneWeekTime);
-            if ((startDate.getDay() > endDate.getDay() && endDate.getDay() !== 0) || (startDate.getDay() === 0 && endDate.getDay() !== 0)) {
-                calendarsCount++;
-            }
-        }
-
-        let calendars = [];
-        for (let i = 0; i < calendarsCount; i++) {
-            calendars.push(<div className="hide-navigation" style={{breakInside: "avoid", pageBreakInside: "avoid"}}>
-                <p id={"classNumberToPrint"} className="text-4xl text-center font-bold"
-                   style={{visibility: "hidden"}}>
-                    Sala: {room?.number}
-                </p>
-                <NewCalendar
-                    activities={roomActivities}
-                    defaultView={Views.WEEK}
-                    views={[Views.WEEK]}
-                    minDate={new Date(0, 0, 0, 6, 0, 0)}
-                    maxDate={new Date(0, 0, 0, 22, 0, 0)}
-                    toolbar={true}
-                    step={15}
-                    backgroundEvent={backgroundEvent}
-                    handleSelectSlot={handleSelectSlot}
-                    selectable={!datesSelected}
-                    defaultDate={!datesSelected ? undefined : new Date(startDate.getTime() + oneWeekTime * i)}
-                />
-            </div>);
-        }
-
-        return (<div ref={ref}>
-            <style type="text/css" media="print">
-                {"@media print \
-                {\
-                   @page { size: A3 landscape; }\
-                   #classNumberToPrint { visibility: visible !important; }\
-                   .rbc-btn-group { display: none !important; }\
-                   .rbc-today { background-color: transparent; }\
-                   .rbc-current-time-indicator { display: none !important; }\
-                   .rbc-day-slot .rbc-background-event { display: none !important; }\
-                   .rbc-timeslot-group { min-height: 30px; }\
-                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }" +
-                    (cbxDeleteOthersChecked ?
-                        "#classNumberToPrint { display: none; }\ .rbc-toolbar { display: none !important; }}" :
-                        "") +
-                    (cbxDeleteDateChecked ?
-                        ".rbc-time-header-content { display: none; }" :
-                        "") +
-                    "\ }"
-                }
-            </style>
-            <div>
-                {calendars}
-            </div>
-        </div>);
-    });
-
     const [cbxDeleteOthersChecked, setCbxDeleteOthersChecked] = React.useState(false);
     const cbxDeleteOthersChanged = () => {
         setCbxDeleteOthersChecked(!cbxDeleteOthersChecked);
@@ -170,15 +104,6 @@ function Room() {
         setCbxSelectDateChecked(!cbxSelectDateChecked);
     };
 
-    const Checkbox = ({label, value, onChange}) => {
-        return (
-            <label>
-                <input type="checkbox" checked={value} onChange={onChange}/>
-                {label}
-            </label>
-        );
-    };
-
     const [smallCalendarValues, setSmallCalendarValues] = useState([new Date(), new Date()]);
     const smallCalendarChanged = (value: React.SetStateAction<Date[]>, _: any) => {
         setSmallCalendarValues(value);
@@ -186,6 +111,118 @@ function Room() {
             window.scrollTo(0, document.body.scrollHeight);
         })
     }
+
+    const calendarRef = useRef();
+
+    const CalendarToPrint = React.forwardRef((props: any, ref) => {
+        let startDate: Date = smallCalendarValues[0];
+        let endDate: Date = smallCalendarValues[1];
+
+        const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
+        const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
+        let calendarsCount = 1;
+        let startDay = startDate.getDay();
+        let endDay = endDate.getDay();
+
+        if (datesSelected) {
+            calendarsCount = Math.ceil((endDate.getTime() - startDate.getTime()) / oneWeekTime);
+
+            if (startDay === 0) {
+                startDay = 7;
+            }
+            if (endDay === 0) {
+                endDay = 7;
+            }
+            if (startDay > endDay) {
+                calendarsCount++;
+            }
+        }
+
+        let calendars = [];
+        for (let i = 0; i < calendarsCount; i++) {
+            let calendarStartDate = new Date(0, 0, 0, 6, 0, 0);
+            let calendarEndDate = new Date(0, 0, 0, 22, 0, 0);
+            let countOfDays = 7;
+            if (datesSelected) {
+                if (i === 0) {
+                    calendarStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 6, 0, 0);
+                }
+                if (i === calendarsCount - 1) {
+                    calendarEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 22, 0, 0);
+                }
+                countOfDays = countDaysLeftInWeek(calendarStartDate, calendarEndDate);
+            }
+
+            let shouldHideDateHeader = false;
+            let defaultView: string = Views.WEEK;
+            if (countOfDays <= 6) {
+                defaultView = 'customWeekView';
+                shouldHideDateHeader = true;
+            }
+
+            let defaultDate: Date | undefined = undefined;
+            if (datesSelected) {
+                if (i === calendarsCount - 1) {
+                    if (calendarsCount === 1) {
+                        defaultDate=new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
+                    } else {
+                        defaultDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - endDay + 1)
+                    }
+                } else {
+                    defaultDate = new Date(startDate.getTime() + oneWeekTime * i);
+                }
+            }
+
+            calendars.push(<div className={datesSelected ? "hide-navigation" : ""}
+                                style={{breakInside: "avoid", pageBreakInside: "avoid"}}>
+                <p id={"classNumberToPrint"} className="text-4xl text-center font-bold"
+                   style={{visibility: "hidden"}}>
+                    Sala: {room?.number}
+                </p>
+                <NewCalendar
+                    activities={roomActivities}
+                    defaultView={defaultView}
+                    views={datesSelected ? {
+                        customWeekView: CustomWeekView, week: true, day: true
+                    } : {week: true}}
+                    countOfDays={countOfDays}
+                    minDate={calendarStartDate}
+                    maxDate={calendarEndDate}
+                    toolbar={!shouldHideDateHeader}
+                    step={15}
+                    backgroundEvent={backgroundEvent}
+                    handleSelectSlot={handleSelectSlot}
+                    selectable={!datesSelected}
+                    defaultDate={defaultDate}
+                />
+            </div>);
+        }
+
+        return (<div ref={ref}>
+            <style type="text/css" media="print">
+                {"@media print \
+                {\
+                   @page { size: A3 landscape; }\
+                   #classNumberToPrint { visibility: visible !important; }\
+                   .rbc-btn-group { display: none !important; }\
+                   .rbc-today { background-color: transparent; }\
+                   .rbc-current-time-indicator { display: none !important; }\
+                   .rbc-day-slot .rbc-background-event { display: none !important; }\
+                   .rbc-timeslot-group { min-height: 30px; }\
+                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }" + (cbxDeleteOthersChecked ? "#classNumberToPrint { display: none; }\ .rbc-toolbar { display: none !important; }}" : "") + (cbxDeleteDateChecked ? ".rbc-time-header-content { display: none; }" : "") + "\ }"}
+            </style>
+            <div>
+                {calendars}
+            </div>
+        </div>);
+    });
+
+    const Checkbox = ({label, value, onChange}) => {
+        return (<label>
+            <input type="checkbox" checked={value} onChange={onChange}/>
+            {label}
+        </label>);
+    };
 
     return (<div className=" mx-16 py-10">
         <div className="flex flex-col items-center text-center">
@@ -227,23 +264,18 @@ function Room() {
                     <hr className="h-px bg-gray-200 border-0 h-0.5 dark:bg-gray-700"/>
                     <div>
                         <CalendarToPrint ref={calendarRef}/>
-
                         <ReactToPrint
-                            trigger={
-                                () =>
-                                    <div className="center-with-margin">
-                                        <button
-                                            className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
-                                            Wydrukuj plan
-                                        </button>
-                                    </div>
-                            }
+                            trigger={() => <div className="center-with-margin">
+                                <button
+                                    className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
+                                    Wydrukuj plan
+                                </button>
+                            </div>}
                             content={() => calendarRef.current}
                             onAfterPrint={() => {
                                 setCbxSelectDateChecked(false);
                                 window.scrollTo(0, 0);
-                            }
-                            }
+                            }}
                         />
                         <div className="center-with-margin">
                             <Checkbox
@@ -264,21 +296,17 @@ function Room() {
                                 onChange={cbxSelectDateChanged}
                             />
                         </div>
-                        {cbxSelectDateChecked ? (
-                                <div className="center-with-margin">
-                                    <Calendar
-                                        onChange={smallCalendarChanged}
-                                        value={smallCalendarValues}
-                                        selectRange={true}
-                                    />
-                                </div>) :
-                            null}
+                        {cbxSelectDateChecked ? (<div className="center-with-margin">
+                            <Calendar
+                                onChange={smallCalendarChanged}
+                                value={smallCalendarValues}
+                                selectRange={true}
+                            />
+                        </div>) : null}
                     </div>
-                    {!cbxSelectDateChecked ? (
-                        <div>
-                            <ReservationForm roomId={id} event={backgroundEvent}/>
-                        </div>
-                    ) : null}
+                    {!cbxSelectDateChecked ? (<div>
+                        <ReservationForm roomId={id} event={backgroundEvent}/>
+                    </div>) : null}
                 </div>
             </div>)}
         </div>
