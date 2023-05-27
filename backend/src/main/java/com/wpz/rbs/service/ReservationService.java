@@ -135,7 +135,7 @@ public class ReservationService {
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    private int declineReservationNoChecks(Reservation reservation) {
+    public int declineReservationNoChecks(Reservation reservation) {
         
         reservation.setStatus(ReservationStatus.DECLINED);
         reservationRepository.save(reservation);
