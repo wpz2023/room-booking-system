@@ -89,9 +89,9 @@ function Room() {
         });
     };
 
-    const [cbxDeleteOthersChecked, setCbxDeleteOthersChecked] = React.useState(false);
-    const cbxDeleteOthersChanged = () => {
-        setCbxDeleteOthersChecked(!cbxDeleteOthersChecked);
+    const [cbxDeleteRangeChecked, setCbxDeleteRangeChecked] = React.useState(false);
+    const cbxDeleteRangeChanged = () => {
+        setCbxDeleteRangeChecked(!cbxDeleteRangeChecked);
     };
 
     const [cbxDeleteDateChecked, setCbxDeleteDateChecked] = React.useState(false);
@@ -138,6 +138,14 @@ function Room() {
             }
         }
 
+        const formats: any = {}
+        if (cbxDeleteDateChecked) {
+            formats.dayFormat = (date, culture, localizer) => localizer.format(date, 'EEE', culture);
+        }
+        if (cbxDeleteRangeChecked) {
+            formats.dayRangeHeaderFormat = ({start, end}, culture, localizer) => localizer.format(start, ' ', culture);
+        }
+
         let calendars = [];
         for (let i = 0; i < calendarsCount; i++) {
             let calendarStartDate = new Date(0, 0, 0, 6, 0, 0);
@@ -164,7 +172,7 @@ function Room() {
             if (datesSelected) {
                 if (i === calendarsCount - 1) {
                     if (calendarsCount === 1) {
-                        defaultDate=new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
+                        defaultDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
                     } else {
                         defaultDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - endDay + 1)
                     }
@@ -194,6 +202,7 @@ function Room() {
                     handleSelectSlot={handleSelectSlot}
                     selectable={!datesSelected}
                     defaultDate={defaultDate}
+                    formats={formats}
                 />
             </div>);
         }
@@ -209,7 +218,8 @@ function Room() {
                    .rbc-current-time-indicator { display: none !important; }\
                    .rbc-day-slot .rbc-background-event { display: none !important; }\
                    .rbc-timeslot-group { min-height: 30px; }\
-                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }" + (cbxDeleteOthersChecked ? "#classNumberToPrint { display: none; }\ .rbc-toolbar { display: none !important; }}" : "") + (cbxDeleteDateChecked ? ".rbc-time-header-content { display: none; }" : "") + "\ }"}
+                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }"
+                    + (cbxDeleteRangeChecked ? ".rbc-toolbar { display: none !important; }}" : "") + "\ }"}
             </style>
             <div>
                 {calendars}
@@ -285,9 +295,9 @@ function Room() {
                             />
                             <a style={{paddingLeft: "10px", paddingRight: "10px"}}></a>
                             <Checkbox
-                                label="Usuń przedział dat i nr sali"
-                                value={cbxDeleteOthersChecked}
-                                onChange={cbxDeleteOthersChanged}
+                                label="Usuń przedział dat"
+                                value={cbxDeleteRangeChecked}
+                                onChange={cbxDeleteRangeChanged}
                             />
                             <a style={{paddingLeft: "10px", paddingRight: "10px"}}></a>
                             <Checkbox

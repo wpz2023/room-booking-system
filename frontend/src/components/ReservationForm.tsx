@@ -173,6 +173,7 @@ function ReservationForm({
             <input
               type="submit"
               className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none"
+              value="Zarezerwuj"
             />
           </div>
         </div>
