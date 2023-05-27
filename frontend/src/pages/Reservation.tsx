@@ -285,7 +285,7 @@ function Reservation() {
                 <NewCalendar
                   activities={roomActivities}
                   defaultView={Views.DAY}
-                  date={reservation?.start_time}
+                  defaultDate={reservation?.start_time}
                   views={[Views.DAY]}
                   minDate={new Date(0, 0, 0, 6, 0, 0)}
                   maxDate={new Date(0, 0, 0, 22, 0, 0)}
