@@ -105,7 +105,11 @@ public class ActivityService {
             if (activity.isPresent() && !activity.get().getIs_usos()) {
                 String reservationId = activity.get().getUrl();
                 Reservation reservation = reservationService.getById(Integer.parseInt(reservationId));
-                emailService.sendDeclinedMessageToUser(reservation);
+
+                if (reservation != null){
+                    emailService.sendDeclinedMessageToUser(reservation);
+                    reservationService.declineReservationNoChecks(reservation);
+                }
             }
         });
 
