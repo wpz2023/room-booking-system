@@ -8,6 +8,10 @@ import { ReservationStatus } from "../utils/ReservationStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ModifyReservationModal from "../components/ModifyReservationModal";
 import { parseDateFromUTC } from "../utils/ParseDate";
+import NewCalendar from "../components/Calendar";
+import { Activity } from "../models/Activity";
+import { mapActivitiesToEvents } from "../utils/MapActivitiesToEvents";
+import { Views } from "react-big-calendar";
 
 function Reservation() {
   const { id } = useParams();
@@ -48,6 +52,33 @@ function Reservation() {
     }
     setReservation(reservationQuery.data);
   }, [token]);
+
+  useEffect(()=>{
+    refetchActivities();
+  }, [roomId])
+
+  let getRoomActivities = () => {
+    if(roomId === undefined) return [];
+    return Api.Api.get(`activity/room/${roomId}`).then((res) => res.data);
+  };
+
+  let {
+    data: activities,
+    isFetching: isRoomActivitiesFetching,
+    refetch: refetchActivities,
+  } = useQuery<Activity[]>(["activities", roomId], getRoomActivities, {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
+  
+  const reservationActivity = {
+    start_time: reservation?.start_time, end_time: reservation?.end_time, 
+    course_name: {pl: reservation?.name}, classtype_name: [],
+    group_number: undefined, 
+    lecturers: [{first_name:reservation?.first_name, last_name: reservation?.last_name}]
+  }
+  const allActivities = activities?.concat([reservationActivity]);
+  const roomActivities = mapActivitiesToEvents(allActivities as Activity[]);
 
   const reservationQuery = useQuery<ReservationData>({
     queryKey: ["reservation"],
@@ -242,6 +273,31 @@ function Reservation() {
           modify={modify}
         />
       )}
+
+      <div>
+        {isRoomActivitiesFetching ? (
+          <div className="mt-8 text-center">Ładowanie danych...</div>
+        ) : (
+          <div>
+            <div className="m-auto flex flex-col my-8 w-60">
+              <hr className="h-px my-8 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
+              <div>
+                <NewCalendar
+                  activities={roomActivities}
+                  defaultView={Views.DAY}
+                  defaultDate={reservation?.start_time}
+                  views={[Views.DAY]}
+                  minDate={new Date(0, 0, 0, 6, 0, 0)}
+                  maxDate={new Date(0, 0, 0, 22, 0, 0)}
+                  toolbar={true}
+                  step={15}
+                  selectable={false}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
