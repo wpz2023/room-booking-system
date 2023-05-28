@@ -233,11 +233,11 @@ function Reservation() {
               <div className=""> {room.data?.number}</div>
             </div>
             <div className="flex flex-row text-xl">
-              <div className="font-medium">Czas rozpoczęcia zajęć: &nbsp;</div>
+              <div className="font-medium">Czas rozpoczęcia: &nbsp;</div>
               <div className="">{reservation?.start_time}</div>
             </div>
             <div className="flex flex-row text-xl">
-              <div className="font-medium"> Czas zakończenia zajęć:&nbsp; </div>
+              <div className="font-medium"> Czas zakończenia:&nbsp; </div>
               <div className=""> {reservation?.end_time}</div>
             </div>
           </div>
