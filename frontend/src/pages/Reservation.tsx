@@ -122,6 +122,7 @@ function Reservation() {
           ) as string,
           end_time: parseDateFromUTC(new Date(reservation.end_time)) as string,
           room_id: reservation.room_id,
+          phone_number: reservation.phone_number,
         },
         {
           headers: {
@@ -207,7 +208,7 @@ function Reservation() {
         <div className="m-4 flex flex-row justify-between">
           <div className="">
             <div className="flex flex-row text-xl">
-              <div className="font-medium">Tytuł zajęć: &nbsp;</div>
+              <div className="font-medium">Nazwa rezerwacji: &nbsp;</div>
               <div className="">{reservation?.name}</div>
             </div>
             <div className="flex flex-row text-xl">
@@ -219,6 +220,10 @@ function Reservation() {
             <div className="flex flex-row text-xl">
               <div className="font-medium">Email prowadzącego:&nbsp; </div>
               <div className="">{reservation?.email}</div>
+            </div>
+            <div className="flex flex-row text-xl">
+              <div className="font-medium">Numer telefonu prowadzącego:&nbsp; </div>
+              <div className="">{reservation?.phone_number ? reservation?.phone_number : "Nie podano"}</div>
             </div>
           </div>
 

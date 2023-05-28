@@ -11,6 +11,7 @@
     Data zakończenia: <b><span th:text="${end_time}"></span></b><br>
     Osoba rezerwująca: <b><span th:text="${first_name} + ' ' + ${last_name}"></span></b><br>
     Email osoby rezerwującej: <b><a th:href="'mailto:' + ${requester_email}"><span th:text="${requester_email}"></span></a></b>
+    Telefon osoby rezerwującej: <b><a th:href="'mailto:' + ${requester_email}"><span th:text="${requester_email} ?: 'Nie podano'"></span></a></b>
 </p>
 
 <p>

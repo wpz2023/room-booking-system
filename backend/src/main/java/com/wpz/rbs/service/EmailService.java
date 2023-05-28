@@ -42,6 +42,7 @@ public class EmailService {
         model.put("start_time", reservation.getStart_time());
         model.put("end_time", reservation.getEnd_time());
         model.put("requester_email", reservation.getEmail());
+        model.put("requester_phone", reservation.getPhone_number());
         model.put("link", "http://localhost:5173/reservations/" + reservation.getId());
 
         Context thymeleafContext = new Context();
