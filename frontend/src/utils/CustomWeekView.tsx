@@ -1,7 +1,6 @@
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Navigate} from 'react-big-calendar'
-// @ts-ignore
 import TimeGrid from 'react-big-calendar/lib/TimeGrid'
 
 export default function CustomWeekView({
@@ -15,6 +14,7 @@ export default function CustomWeekView({
                                        }) {
     const title = CustomWeekView.title(date, {localizer}, countOfDays);
     const currRange = useMemo(() => CustomWeekView.range(date, {localizer}, countOfDays), [date, localizer, countOfDays])
+
     return (
         <div>
             <div className="rbc-toolbar rbc-toolbar-label">
@@ -58,7 +58,7 @@ CustomWeekView.range = (date: Date, {localizer}, countOfDays: number) => {
 }
 
 CustomWeekView.navigate = (date: Date, action, {localizer}, countOfDays: number) => {
-    // without this mock it will break whole calendar - anyway still will use passed countOfDays instead of hardcoded 2
+    // without this mock it will break whole calendar - anyway still it uses passed countOfDays instead of hardcoded "2"
     countOfDays = countOfDays ?? 2
     switch (action) {
         case Navigate.PREVIOUS:
@@ -73,7 +73,6 @@ CustomWeekView.navigate = (date: Date, action, {localizer}, countOfDays: number)
 }
 
 CustomWeekView.title = (date: Date, {localizer}, countOfDays: number) => {
-    // without this mock it will break whole calendar - anyway still will use passed countOfDays instead of hardcoded 2
     countOfDays = countOfDays ?? 2
     const [start, ...rest] = CustomWeekView.range(date, {localizer}, countOfDays)
     const noDatesInArray = rest.length === 0;
