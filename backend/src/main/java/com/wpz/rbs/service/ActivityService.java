@@ -68,7 +68,8 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public ActivityConflict getConflictsAllRoom() throws ParseException {
+    public ActivityConflict resolveConflictsAllRoom(List<String> activitiesId) throws ParseException {
+        activityRepository.deleteAllById(activitiesId);
         Iterable<Room> rooms = roomRepository.findAll();
         for (Room room : rooms) {
             ActivityConflict conflict = getConflictsRoom(room.getId());
