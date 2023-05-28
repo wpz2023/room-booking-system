@@ -1,22 +1,23 @@
-export function changeClasstypeName(classType: Map<string, string>){
-    if (classType["pl"]=="Wykład"){
-        classType["pl"] = "WYK"
-    } else if (classType["pl"]=="Ćwiczenia"){
-        classType["pl"] =  "CW"
-    } else if (classType["pl"]=="Konwersatorium"){
-        classType["pl"] = "KON"
-    } else if (classType["pl"]=="Laboratorium"){
-        classType["pl"] = "LAB"
-    } else if (classType["pl"]=="Seminarium"){
-        classType["pl"] = "SEM"
-    } else if (classType["pl"]=="Pracownia"){
-        classType["pl"] = "PRA"
-    } else if (classType["pl"]=="Pracownia komputerowa"){
-        classType["pl"] = "PKO"
-    } else if (classType["pl"]=="Lektorat"){
-        classType["pl"] = "LEK"
-    } else if (classType["pl"]=="Warsztat"){
-        classType["pl"] = "WAR"
-    }
-    return classType;
+export function changeClasstypeName(classType: Map<string, string>) {
+  const type = classType.get("pl");
+  if (type == "Wykład") {
+    classType.set("pl", "WYK");
+  } else if (type == "Ćwiczenia") {
+    classType.set("pl", "CW");
+  } else if (type == "Konwersatorium") {
+    classType.set("pl", "KON");
+  } else if (type == "Laboratorium") {
+    classType.set("pl", "LAB");
+  } else if (type == "Seminarium") {
+    classType.set("pl", "SEM");
+  } else if (type == "Pracownia") {
+    classType.set("pl", "PRA");
+  } else if (type == "Pracownia komputerowa") {
+    classType.set("pl", "PKO");
+  } else if (type == "Lektorat") {
+    classType.set("pl", "LEK");
+  } else if (type == "Warsztat") {
+    classType.set("pl", "WAR");
+  }
+  return classType;
 }

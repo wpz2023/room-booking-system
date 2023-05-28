@@ -67,6 +67,7 @@ function NewCalendar({
   maxDate,
   toolbar,
   date,
+  defaultDate,
   step,
   eventPropGetter,
   backgroundEvent,
@@ -112,6 +113,7 @@ function NewCalendar({
       step={step}
       toolbar={toolbar}
       date={date}
+      defaultDate={defaultDate}
       tooltipAccessor={tooltipAccessor}
       dayLayoutAlgorithm="no-overlap"
       eventPropGetter={eventPropGetter}

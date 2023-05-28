@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RoomData } from "../models/Room";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Api from "../Api";
-import ConflictPopUp from "./ConflictPopUp";
+import ConflictPopUp from "../components/ConflictPopUp";
 import { Conflict } from "../models/Conflict";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,9 +11,7 @@ function ImportData() {
   const token = window.sessionStorage.getItem("jwtToken");
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
-  const [loopIndex, setLoopIndex] = useState<number>(-1);
-  const [isImportLoop, setIsImportLoop] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<RoomData>({
+  const [clickedRoom, setRoom] = useState<RoomData>({
     capacity: 0,
     roomAnnotation: undefined,
     type: "",
@@ -22,25 +20,8 @@ function ImportData() {
   });
 
   useEffect(() => {
-    if (loopIndex >= 0 && loopIndex < data.length){
-      setSelectedRoom({
-        ...selectedRoom,
-        id: data[loopIndex].id,
-        number: data[loopIndex].number,
-      });
-    } else {
-      setLoopIndex(-1)
-      setIsImportLoop(false)
-    }
-  }, [loopIndex])
-
-  useEffect(() => {
     if (activitiesToDelete.length > 0) {
-      mutate(selectedRoom.id);
-    } else {
-      if (loopIndex >= 0 && !popupVisible){
-        setLoopIndex(loopIndex + 1)
-      }
+      mutate(clickedRoom.id);
     }
   }, [activitiesToDelete]);
 
@@ -63,26 +44,22 @@ function ImportData() {
         if (responseData) {
           setPopupVisible(true);
         } else {
-          if(!isImportLoop){
-            toast.success("Udało się zaimportować plan sali");
-          } else if (loopIndex == data?.length-1){
-            toast.success("Udało się zaimportować plany wszystkich sal");
-          }
+          toast.success("Udało się zaimportować plan sali");
         }
       },
     }
   );
 
   const getRoomActivities = async () => {
-    if (selectedRoom.id != 0) {
+    if (clickedRoom.id != 0) {
       return await Api.authApi
-        .get(`import/activity/${selectedRoom.id}`, {
+        .get(`import/activity/${clickedRoom.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         .then((res) => res.data)
-        .finally(async () => await mutate(selectedRoom.id));
+        .finally(async () => await mutate(clickedRoom.id));
     }
     return null;
   };
@@ -97,20 +74,7 @@ function ImportData() {
 
   useEffect(() => {
     refetchRoomActivities();
-  }, [selectedRoom]);
-
-  const getRooms = () => {
-    return Api.Api.get("room")
-        .then((res) => res.data);
-  };
-
-  const { data: roomsData } = useQuery<RoomData[]>(
-      ["roomsData"],
-      getRooms,
-      {
-        refetchOnWindowFocus: false,
-      }
-  );
+  }, [clickedRoom]);
 
   const getImportRooms = () => {
     return Api.authApi
@@ -122,8 +86,8 @@ function ImportData() {
       .then((res) => res.data);
   };
 
-  const { isFetching, data: importRoomsData, refetch } = useQuery<RoomData[]>(
-    ["importRoomsData"],
+  const { isFetching, data, refetch } = useQuery<RoomData[]>(
+    ["data"],
     getImportRooms,
     {
       refetchOnWindowFocus: false,
@@ -131,16 +95,14 @@ function ImportData() {
     }
   );
 
-  const data = importRoomsData || roomsData
-
   const handleClick = () => {
     refetch();
   };
 
   const onButtonClick = (e) => {
     e.preventDefault();
-    setSelectedRoom({
-      ...selectedRoom,
+    setRoom({
+      ...clickedRoom,
       id: e.currentTarget.dataset.value1,
       number: e.currentTarget.dataset.value2,
     });
@@ -150,58 +112,30 @@ function ImportData() {
     setActivitiesToDelete(activities);
   };
 
-  const importAllRoomsActivities = (e) => {
-    e.preventDefault();
-    setIsImportLoop(true)
-    setLoopIndex(0)
-  }
-
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
       <ToastContainer />
       <div className="w-2/5 pb-14 text-center text-2xl font-medium">
         <p>Import danych</p>
       </div>
-      <div className="w-[450px] flex flex-col items-center">
-          <button
-              onClick={handleClick}
-              className="w-2/5 px-4 py-3 mb-14 transition hover:scale-110 delay-150 rounded-lg
-                bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
-              Importuj sale
-          </button>
-      </div>
-
+      <button
+        className="mb-14 px-12 py-2  transition hover:scale-110 delay-150 rounded-lg
+        bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"
+        onClick={handleClick}
+      >
+        Importuj dane
+      </button>
       {isFetching ? (
         <p>Ładowanie danych</p>
       ) : (
         <div>
-          {data?.length>0 && (
-            <div>
-              <div className="flex flex-col items-center mb-3">
-                <button
-                    onClick={importAllRoomsActivities}
-                    disabled={isActivitiesFetching}
-                    style={{
-                      cursor: isActivitiesFetching ? "wait" : "pointer",
-                    }}
-                    className="px-4 py-2 mb-3 w-2/5 transition hover:scale-110 delay-150 rounded-lg
-                         bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500">
-                  Importuj plany wszystkich sal
-                </button>
-                { isImportLoop && (
-                    <p className="mb-2 font-normal text-center">Importowanie planów</p>
-                )}
-              </div>
-
-              <div className="w-[450px] px-6 flex flex-col">
-                <div className="flex flex-row items-end">
-                  <p className="basis-3/5 font-medium">Numer sali</p>
-                </div>
-                <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
-              </div>
+          {data && (
+            <div className="w-[450px] px-6">
+              <p className="font-medium">Numer sali</p>
+              <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
             </div>
           )}
-          <ul role="list" className="w-full p-6 divide-y divide-slate-200 mt-2 ">
+          <ul role="list" className="w-full p-6 divide-y divide-slate-200">
             {data?.map((room) => (
               <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                 <div className="flex text-center items-center">
@@ -220,8 +154,8 @@ function ImportData() {
                     >
                       Importuj plan
                     </button>
-                    {isActivitiesFetching && selectedRoom.id == room.id && !isImportLoop && (
-                      <p className="font-normal">Importowanie planu</p>
+                    {isActivitiesFetching && clickedRoom.id == room.id && (
+                      <p className="pt-2 font-normal">Importowanie planu</p>
                     )}
                   </div>
                 </div>
@@ -233,7 +167,7 @@ function ImportData() {
               conflict={roomConflict}
               onClose={() => setPopupVisible(false)}
               deleteActivities={deleteActivities}
-              roomName={selectedRoom.number}
+              roomName={clickedRoom.number}
             />
           )}
         </div>
