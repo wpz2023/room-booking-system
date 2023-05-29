@@ -43,7 +43,7 @@ const Event: React.FC<EventProps> = ({ event }) => {
     >
       {event.classtype_name && event.group_number && (
         <div className="mb-1.5 rbc-event-location">
-          {event.classtype_name["pl"]}, gr.{event.group_number}
+          {event.classtype_name.get("pl")}, gr.{event.group_number}
         </div>
       )}
       {event.course_name && (
@@ -95,7 +95,7 @@ function NewCalendar({
         }
       });
 
-      return `${event.classtype_name["pl"]}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
+      return `${event.classtype_name.get("pl")}, gr.${event.group_number}\n${event.course_name["pl"]} - \n${lecturers_txt}`;
     }
   };
 
