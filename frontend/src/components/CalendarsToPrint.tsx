@@ -31,18 +31,18 @@ function CalendarsToPrint({
     const CalendarsToPrintForwardRef = React.forwardRef((props: any, ref) => {
         let startDate: Date = rangeStart;
         let endDate: Date = rangeEnd;
+        const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
+        const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
+        let calendarsCount = 1;
+        let startDay = startDate.getDay();
+        let endDay = endDate.getDay();
+        let calendars = [];
 
         const formats: any = {}
         if (cbxDeleteDatesChecked) {
             formats.dayFormat = (date, culture, localizer) => localizer.format(date, 'EEE', culture);
             formats.dayRangeHeaderFormat = ({start, end}, culture, localizer) => localizer.format(start, ' ', culture);
         }
-
-        const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
-        const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
-        let calendarsCount = 1;
-        let startDay = startDate.getDay();
-        let endDay = endDate.getDay();
 
         if (datesSelected) {
             calendarsCount = Math.ceil((endDate.getTime() - startDate.getTime()) / oneWeekTime);
@@ -58,11 +58,14 @@ function CalendarsToPrint({
             }
         }
 
-        let calendars = [];
         for (let i = 0; i < calendarsCount; i++) {
             let calendarStartDate = new Date(0, 0, 0, 6, 0, 0);
             let calendarEndDate = new Date(0, 0, 0, 22, 0, 0);
             let countOfDays = 7;
+            let shouldHideDateHeader = false;
+            let defaultView: string = Views.WEEK;
+            let defaultDate: Date | undefined = undefined;
+
             if (datesSelected) {
                 if (i === 0) {
                     calendarStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 6, 0, 0);
@@ -73,14 +76,11 @@ function CalendarsToPrint({
                 countOfDays = countDaysLeftInWeek(calendarStartDate, calendarEndDate);
             }
 
-            let shouldHideDateHeader = false;
-            let defaultView: string = Views.WEEK;
             if (countOfDays <= 6) {
                 defaultView = 'customWeekView';
                 shouldHideDateHeader = true;
             }
 
-            let defaultDate: Date | undefined = undefined;
             if (datesSelected) {
                 if (i === calendarsCount - 1) {
                     if (calendarsCount === 1) {

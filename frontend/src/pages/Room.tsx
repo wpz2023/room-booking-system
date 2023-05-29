@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {RoomAnnotation, RoomData} from "../models/Room";
+import {RoomAnnotation} from "../models/Room";
 import Api from "../Api";
 import {Activity} from "../models/Activity";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import {BackgroundEvent} from "./Calendar";
 import {mapActivitiesToEvents} from "../utils/MapActivitiesToEvents";
-import ReservationForm from "./ReservationForm";
 import Calendar from 'react-calendar';
-import CalendarsToPrint from "./CalendarsToPrint";
+import {getRoomInfo} from "../utils/GetRoomInfo";
+import CalendarsToPrint from "../components/CalendarsToPrint";
+import ReservationForm from "../components/ReservationForm";
+import {BackgroundEvent} from "../components/Calendar";
 
 function Room() {
     const {id} = useParams();
@@ -31,11 +32,11 @@ function Room() {
         refetchRoom();
     }, [token]);
 
-  const {
-    data: room,
-    isFetching: isRoomFetching,
-    refetch: refetchRoom,
-  } = getRoomInfo(id);
+    const {
+        data: room,
+        isFetching: isRoomFetching,
+        refetch: refetchRoom,
+    } = getRoomInfo(id);
 
     useEffect(() => {
         if (room?.roomAnnotation === null) {
@@ -49,16 +50,16 @@ function Room() {
         return Api.Api.get(`activity/room/${id}`).then((res) => res.data);
     };
 
-  let {
-    data: activities,
-    isFetching: isRoomActivitiesFetching,
-    refetch: refetchActivities,
-  } = useQuery<Activity[]>(["activities"], getRoomActivities, {
-    refetchOnWindowFocus: false,
-    enabled: true,
-  });
+    let {
+        data: activities,
+        isFetching: isRoomActivitiesFetching,
+        refetch: refetchActivities,
+    } = useQuery<Activity[]>(["activities"], getRoomActivities, {
+        refetchOnWindowFocus: false,
+        enabled: true,
+    });
 
-  const roomActivities = mapActivitiesToEvents(activities as Activity[]);
+    const roomActivities = mapActivitiesToEvents(activities as Activity[]);
 
     const pushNewRoomAnnotation = useMutation((newAnnotation) => {
         const roomData = {
