@@ -3,6 +3,7 @@ package com.wpz.rbs.service;
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,15 @@ public class UsosAuthService {
         OAuthParameters oauthParameters = new OAuthParameters();
         oauthParameters.signer = signer;
         oauthParameters.consumerKey = consumerKey;
-        return new NetHttpTransport().createRequestFactory(oauthParameters).buildGetRequest(genericUrl).execute();
+
+        HttpRequest getRequest = new NetHttpTransport().createRequestFactory(oauthParameters).buildGetRequest(genericUrl);
+        HttpResponse response = getRequest.execute();
+
+        if (response.isSuccessStatusCode()) {
+            return response;
+        } else {
+            throw new IOException("Bad status code: " + response.getStatusCode() + " error: " + response.getStatusMessage());
+        }
     }
 }
 

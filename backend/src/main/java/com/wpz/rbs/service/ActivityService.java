@@ -23,8 +23,7 @@ public class ActivityService {
     private final EmailService emailService;
     private final ReservationService reservationService;
 
-    public ActivityService(ActivityRepository activityRepository, EmailService emailService,ReservationService reservationService) {
-    public ActivityService(ActivityRepository activityRepository, RoomRepository roomRepository) {
+    public ActivityService(ActivityRepository activityRepository, RoomRepository roomRepository, EmailService emailService, ReservationService reservationService) {
         this.activityRepository = activityRepository;
         this.roomRepository = roomRepository;
         this.emailService = emailService;
@@ -121,7 +120,7 @@ public class ActivityService {
                 String reservationId = activity.get().getUrl();
                 Reservation reservation = reservationService.getById(Integer.parseInt(reservationId));
 
-                if (reservation != null){
+                if (reservation != null) {
                     emailService.sendDeclinedMessageToUser(reservation);
                     reservationService.declineReservationNoChecks(reservation);
                 }

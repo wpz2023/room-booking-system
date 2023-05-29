@@ -1,14 +1,14 @@
 package com.wpz.rbs.service.importers;
 
-import java.io.IOException;
-
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
 import com.wpz.rbs.model.Lecturer;
 import com.wpz.rbs.service.LecturerService;
 import com.wpz.rbs.service.UsosAuthService;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class LecturerImportService {
@@ -24,19 +24,19 @@ public class LecturerImportService {
     }
 
     public Lecturer getOrImportLecturer(String lecturerId) throws IOException {
-        var lecturerOptional = lecturerService.getByIdOptional(lecturerId);
+        Optional<Lecturer> lecturerOptional = lecturerService.getByIdOptional(lecturerId);
 
-        if(lecturerOptional.isPresent()){
+        if (lecturerOptional.isPresent()) {
             return lecturerOptional.get();
         }
 
-        var genericUrl = new GenericUrl("https://apps.usos.uj.edu.pl/services/users/user");
+        GenericUrl genericUrl = new GenericUrl("https://apps.usos.uj.edu.pl/services/users/user");
         genericUrl.set("user_id", lecturerId);
         genericUrl.set("fields", "id|first_name|last_name");
 
         String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
 
-        var lecturer = mapper.readValue(jsonResponse, Lecturer.class);
+        Lecturer lecturer = mapper.readValue(jsonResponse, Lecturer.class);
 
         return lecturerService.saveOrUpdate(lecturer);
     }
