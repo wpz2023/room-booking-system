@@ -63,7 +63,9 @@ function ReservationForm({
       reset();
     },
     onError: () => {
+      console.log("a");
       toast.info("Nie udało się stworzyć rezerwacji");
+      console.log("b");
     },
   });
 
@@ -85,7 +87,6 @@ function ReservationForm({
 
   return (
     <div className="m-10">
-      <ToastContainer />
       <div className="text-center text-2xl font-bold mb-2">Dane rezerwacji</div>
       <p
         className={`text-center font-big text-xl ${
@@ -157,7 +158,8 @@ function ReservationForm({
                   pattern: {
                     value:
                       /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{1,6}$/,
-                    message: "Błędny format. Spróbuj: +91936778875 lub 8989829304 "
+                    message:
+                      "Błędny format. Spróbuj: +91936778875 lub 8989829304 ",
                   },
                 })}
               />
