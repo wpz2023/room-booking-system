@@ -4,13 +4,13 @@ import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.RoomAnnotation;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.repository.RoomRepository;
-
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomService {
@@ -24,7 +24,7 @@ public class RoomService {
     }
 
     public List<Room> getAllFiltered(String number, String type, Integer capacityMin, String annotation, String startTime, String endTime) {
-        var exampleRoom = new Room();
+        Room exampleRoom = new Room();
         exampleRoom.setNumber(number);
         exampleRoom.setType(type);
         exampleRoom.setRoomAnnotation(RoomAnnotation.getByAnnotation(annotation));
@@ -48,22 +48,22 @@ public class RoomService {
     }
 
     public Room getById(int id) {
-        return roomRepository.findById(id).get();
+        return roomRepository.findById(id).orElse(null);
     }
 
     public void saveOrUpdate(Room room) {
-        var optional = roomRepository.findById(room.getId());
-        if (optional.isPresent()) {
-            var existingRoomType = optional.get().getRoomAnnotation();
+        Optional<Room> roomOptional = roomRepository.findById(room.getId());
+        if (roomOptional.isPresent()) {
+            RoomAnnotation existingRoomType = roomOptional.get().getRoomAnnotation();
             room.setRoomAnnotation(existingRoomType);
         }
         roomRepository.save(room);
     }
 
     public Room updateRoomAnnotation(int roomId, String roomAnnotation) {
-        var optional = roomRepository.findById(roomId);
-        if (optional.isPresent() && RoomAnnotation.checkIfCorrectAnnotation(roomAnnotation)) {
-            Room room = optional.get();
+        Optional<Room> roomOptional = roomRepository.findById(roomId);
+        if (roomOptional.isPresent() && RoomAnnotation.checkIfCorrectAnnotation(roomAnnotation)) {
+            Room room = roomOptional.get();
             room.setRoomAnnotation(RoomAnnotation.getByAnnotation(roomAnnotation));
             roomRepository.save(room);
             return room;
