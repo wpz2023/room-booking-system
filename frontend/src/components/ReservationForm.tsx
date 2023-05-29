@@ -63,9 +63,7 @@ function ReservationForm({
       reset();
     },
     onError: () => {
-      console.log("a");
       toast.info("Nie udało się stworzyć rezerwacji");
-      console.log("b");
     },
   });
 
