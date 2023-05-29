@@ -2,6 +2,7 @@ package com.wpz.rbs.service;
 
 import com.wpz.rbs.model.Activity;
 import com.wpz.rbs.model.ActivityConflict;
+import com.wpz.rbs.model.Reservation;
 import com.wpz.rbs.repository.ActivityRepository;
 import com.wpz.rbs.utils.StaticHelpers;
 import org.springframework.stereotype.Service;
@@ -10,14 +11,19 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ActivityService {
 
     private final ActivityRepository activityRepository;
+    private final EmailService emailService;
+    private final ReservationService reservationService;
 
-    public ActivityService(ActivityRepository activityRepository) {
+    public ActivityService(ActivityRepository activityRepository, EmailService emailService,ReservationService reservationService) {
         this.activityRepository = activityRepository;
+        this.emailService = emailService;
+        this.reservationService = reservationService;
     }
 
     public List<Activity> getAll() {
@@ -94,6 +100,19 @@ public class ActivityService {
     }
 
     public ActivityConflict resolveConflictsRoom(int roomId, List<String> activitiesId) throws ParseException {
+        activitiesId.forEach(activityId -> {
+            Optional<Activity> activity = activityRepository.findById(activityId);
+            if (activity.isPresent() && !activity.get().getIs_usos()) {
+                String reservationId = activity.get().getUrl();
+                Reservation reservation = reservationService.getById(Integer.parseInt(reservationId));
+
+                if (reservation != null){
+                    emailService.sendDeclinedMessageToUser(reservation);
+                    reservationService.declineReservationNoChecks(reservation);
+                }
+            }
+        });
+
         activityRepository.deleteAllById(activitiesId);
         return getConflictsRoom(roomId);
     }

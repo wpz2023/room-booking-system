@@ -26,6 +26,8 @@ public class Reservation {
     @Column
     private String end_time;
     @Column
+    private String phone_number;
+    @Column
     private int room_id;
     @Column
     @Enumerated(EnumType.STRING)
@@ -42,5 +44,6 @@ public class Reservation {
         this.room_id = reservation.getRoom_id();
         this.name = reservation.getName();
         this.email = reservation.getEmail();
+        this.phone_number = reservation.getPhone_number();
     }
 }

@@ -31,16 +31,11 @@ function Room() {
         refetchRoom();
     }, [token]);
 
-    const getRoomInfo = () => {
-        return Api.Api.get(`room/${id}`).then((res) => res.data);
-    };
-
-    // zmienne do zarządzania informacjami nt. sali
-    const {
-        data: room, isFetching: isRoomFetching, refetch: refetchRoom,
-    } = useQuery<RoomData>(["room_info"], getRoomInfo, {
-        refetchOnWindowFocus: false, enabled: true,
-    });
+  const {
+    data: room,
+    isFetching: isRoomFetching,
+    refetch: refetchRoom,
+  } = getRoomInfo(id);
 
     useEffect(() => {
         if (room?.roomAnnotation === null) {
@@ -54,15 +49,16 @@ function Room() {
         return Api.Api.get(`activity/room/${id}`).then((res) => res.data);
     };
 
-    // dane do zarządzania informacjami nt. rezerwacji danej sali
-    let {
-        data: activities, isFetching: isRoomActivitiesFetching, refetch: refetchActivities,
-    } = useQuery<Activity[]>(["activities"], getRoomActivities, {
-        refetchOnWindowFocus: false, enabled: true,
-    });
+  let {
+    data: activities,
+    isFetching: isRoomActivitiesFetching,
+    refetch: refetchActivities,
+  } = useQuery<Activity[]>(["activities"], getRoomActivities, {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
-    // przechowuje eventy do wyświetlenia w kalendarzu
-    const roomActivities = mapActivitiesToEvents(activities);
+  const roomActivities = mapActivitiesToEvents(activities as Activity[]);
 
     const pushNewRoomAnnotation = useMutation((newAnnotation) => {
         const roomData = {
