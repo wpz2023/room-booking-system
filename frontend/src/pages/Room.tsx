@@ -47,7 +47,6 @@ function Room() {
     return Api.Api.get(`activity/room/${id}`).then((res) => res.data);
   };
 
-  // dane do zarządzania informacjami nt. rezerwacji danej sali
   let {
     data: activities,
     isFetching: isRoomActivitiesFetching,
@@ -57,7 +56,6 @@ function Room() {
     enabled: true,
   });
 
-  // przechowuje eventy do wyświetlenia w kalendarzu
   const roomActivities = mapActivitiesToEvents(activities as Activity[]);
 
   const pushNewRoomAnnotation = useMutation((newAnnotation) => {
@@ -104,7 +102,7 @@ function Room() {
             {!token ? (
               <p className="mb-2 text-lg">
                 <span className="font-bold">Rodzaj: </span>
-                {room?.roomAnnotation}
+                {room?.roomAnnotation ? room?.roomAnnotation : "Nie ustawiono"}
               </p>
             ) : (
               <div className="mb-2">

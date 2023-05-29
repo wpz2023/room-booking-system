@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import Api from "../Api";
 import { BackgroundEvent } from "./Calendar";
 import { parseDateFromUTC } from "../utils/ParseDate";
+import "react-toastify/dist/ReactToastify.css";
 
 type FormValues = {
   name: string;
@@ -21,6 +22,7 @@ function ReservationForm({
   roomId: string | undefined;
   event: BackgroundEvent | undefined;
 }) {
+  const toastId = useRef(null);
   const form = useForm<FormValues>({
     defaultValues: {
       name: "",
@@ -46,6 +48,7 @@ function ReservationForm({
       start: string;
       end: string;
     }) => {
+      toastId.current = toast.loading("Ładowanie...");
       const data = await Api.Api.post("reservation", {
         name: formValues.name,
         email: formValues.email,
@@ -59,11 +62,21 @@ function ReservationForm({
       return data;
     },
     onSuccess: () => {
-      toast.success("Udało ci się stworzyć rezerwację!");
+      toast.update(toastId.current, {
+        render: "Udało się stworzyć rezerwacje",
+        type: "success",
+        autoClose: 2000,
+        isLoading: false,
+      });
       reset();
     },
     onError: () => {
-      toast.info("Nie udało się stworzyć rezerwacji");
+      toast.update(toastId.current, {
+        render: "Nie udało się stworzyć rezerwacji",
+        type: "error",
+        autoClose: 2000,
+        isLoading: false,
+      });
     },
   });
 
@@ -142,7 +155,7 @@ function ReservationForm({
               </label>
               <input
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium  outline-none focus:border-sky-500 focus:shadow-md"
-                placeholder={"8989829304"}
+                placeholder={"123456789"}
                 type="tel"
                 id="phoneNumber"
                 {...register("phoneNumber", {
@@ -157,7 +170,8 @@ function ReservationForm({
                   pattern: {
                     value:
                       /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{1,6}$/,
-                    message: "Błędny format. Spróbuj: +91936778875 lub 8989829304 "
+                    message:
+                      "Błędny format. Spróbuj: +91936778875 lub 8989829304 ",
                   },
                 })}
               />
