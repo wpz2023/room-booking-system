@@ -18,7 +18,7 @@ function Room() {
     const [backgroundEvent, setBackgroundEvent] = useState<BackgroundEvent>();
     const [cbxDeleteDatesChecked, setCbxDeleteDatesChecked] = React.useState(false);
     const [cbxSelectDateChecked, setCbxSelectDateChecked] = React.useState(false);
-    const [smallCalendarValues, setSmallCalendarValues] = useState([new Date(), new Date()]);
+    const [smallCalendarValues, setSmallCalendarValues] = useState([undefined, undefined]);
 
     let token = window.sessionStorage.getItem("jwtToken");
 

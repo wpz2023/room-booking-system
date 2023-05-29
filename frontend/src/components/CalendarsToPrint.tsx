@@ -18,8 +18,8 @@ function CalendarsToPrint({
                               handleSelectSlot,
                               onAfterPrint
                           }: {
-    rangeStart: Date,
-    rangeEnd: Date,
+    rangeStart: Date | undefined,
+    rangeEnd: Date | undefined,
     cbxDeleteDatesChecked: boolean,
     cbxSelectDateChecked: boolean,
     roomNumber?: number,
@@ -29,8 +29,8 @@ function CalendarsToPrint({
     onAfterPrint: () => void
 }) {
     const CalendarsToPrintForwardRef = React.forwardRef((props: any, ref) => {
-        let startDate: Date = rangeStart;
-        let endDate: Date = rangeEnd;
+        let startDate: Date = rangeStart ?? new Date();
+        let endDate: Date = rangeEnd ?? new Date();
         const datesSelected = cbxSelectDateChecked && startDate != null && endDate != null;
         const oneWeekTime = 1000 * 60 * 60 * 24 * 7;
         let calendarsCount = 1;
@@ -145,10 +145,13 @@ function CalendarsToPrint({
     return <div><CalendarsToPrintForwardRef ref={calendarRef}/>
         <ReactToPrint
             trigger={() => <div style={{marginTop: "15px", display: "flex", justifyContent: "center"}}>
-                <button
-                    className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
-                    Wydrukuj plan
-                </button>
+                {(cbxSelectDateChecked && (rangeStart == null || rangeEnd == null))
+                    ? null
+                    : (<button
+                        className="hover:shadow-form rounded-md bg-sky-500 py-3 px-8 text-center text-base font-semibold text-white outline-none">
+                        Wydrukuj plan
+                    </button>)
+                }
             </div>}
             content={() => calendarRef.current}
             onAfterPrint={onAfterPrint}
