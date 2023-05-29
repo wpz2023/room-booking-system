@@ -3,13 +3,13 @@ package com.wpz.rbs.controller;
 import com.wpz.rbs.model.Reservation;
 import com.wpz.rbs.model.reservation.ReservationDTO;
 import com.wpz.rbs.service.ReservationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("reservation")
@@ -21,8 +21,12 @@ public class ReservationController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createReservation(@RequestBody @Validated ReservationDTO reservation) throws ParseException {
-        return reservationService.createReservation(reservation);
+    public ResponseEntity<?> createReservation(@RequestBody @Validated ReservationDTO reservation) {
+        try {
+            return reservationService.createReservation(reservation);
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @GetMapping("manage")
@@ -31,8 +35,13 @@ public class ReservationController {
     }
 
     @GetMapping("manage/{id}")
-    public Reservation getReservationById(@PathVariable int id) {
-        return reservationService.getById(id);
+    public ResponseEntity<Reservation> getReservationById(@PathVariable int id) {
+        Reservation reservation = reservationService.getById(id);
+        if (reservation != null) {
+            return ResponseEntity.ok(reservation);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @GetMapping("manage/room/{roomId}")
@@ -41,17 +50,29 @@ public class ReservationController {
     }
 
     @PutMapping("manage/{id}")
-    public ResponseEntity<?> updateAndAcceptReservation(@PathVariable int id, @RequestBody @Validated ReservationDTO editedReservation) throws ParseException {
-        return reservationService.updateAndAcceptReservation(id, editedReservation);
+    public ResponseEntity<?> updateAndAcceptReservation(@PathVariable int id, @RequestBody @Validated ReservationDTO editedReservation) {
+        try {
+            return reservationService.updateAndAcceptReservation(id, editedReservation);
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @PostMapping("manage/{id}/accept")
-    public ResponseEntity<?> acceptReservation(@PathVariable int id) throws ParseException {
-        return reservationService.acceptReservation(id);
+    public ResponseEntity<?> acceptReservation(@PathVariable int id) {
+        try {
+            return reservationService.acceptReservation(id);
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @PostMapping("manage/{id}/decline")
-    public ResponseEntity<?> declineReservation(@PathVariable int id) throws ParseException {
-        return reservationService.declineReservation(id);
+    public ResponseEntity<?> declineReservation(@PathVariable int id) {
+        try {
+            return reservationService.declineReservation(id);
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 }

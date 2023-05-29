@@ -34,7 +34,7 @@ public class AuthenticationService {
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
 
-        var jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
         saveToken(jwtToken);
 
         return AuthenticationResponse.builder()
@@ -43,7 +43,7 @@ public class AuthenticationService {
     }
 
     private void saveToken(String jwtToken) {
-        var token = Token.builder()
+        Token token = Token.builder()
                 .token(jwtToken)
                 .build();
         tokenRepository.deleteAll();
