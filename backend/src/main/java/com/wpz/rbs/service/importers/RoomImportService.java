@@ -6,7 +6,6 @@ import com.wpz.rbs.model.Room;
 import com.wpz.rbs.model.usos.RoomsUsos;
 import com.wpz.rbs.service.RoomService;
 import com.wpz.rbs.service.UsosAuthService;
-
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.util.Objects;
 public class RoomImportService {
     private final UsosAuthService usosAuthService;
     private final RoomService roomService;
-
     private final ObjectMapper mapper = new ObjectMapper();
 
     public RoomImportService(UsosAuthService usosAuthService, RoomService roomService) {
@@ -32,14 +30,17 @@ public class RoomImportService {
         genericUrl.set("fields", "rooms[id|number|type|capacity]");
 
         String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
-
         RoomsUsos roomsUsos = mapper.readValue(jsonResponse, RoomsUsos.class);
-        var filtered = roomsUsos.rooms.stream().filter(room -> Objects.equals(room.getType(), "didactics_room")).toList();
 
-        for (var room : filtered) {
+        List<Room> filteredRooms = roomsUsos.rooms
+                .stream()
+                .filter(room -> Objects.equals(room.getType(), "didactics_room"))
+                .toList();
+
+        for (Room room : filteredRooms) {
             roomService.saveOrUpdate(room);
         }
 
-        return filtered;
+        return filteredRooms;
     }
 }

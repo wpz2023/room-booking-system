@@ -35,7 +35,6 @@ public class LecturerImportService {
         genericUrl.set("fields", "id|first_name|last_name");
 
         String jsonResponse = usosAuthService.executeUsosApiRequest(genericUrl).parseAsString();
-
         Lecturer lecturer = mapper.readValue(jsonResponse, Lecturer.class);
 
         return lecturerService.saveOrUpdate(lecturer);
