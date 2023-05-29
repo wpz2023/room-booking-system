@@ -8,14 +8,5 @@ export interface ReservationData {
   end_time: string;
   room_id: number;
   status: string;
-}
-
-export interface NewReservation {
-  name: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  start_time: string;
-  end_time: string;
-  room_id: number;
+  phone_number: string;
 }
