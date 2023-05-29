@@ -5,22 +5,28 @@ import NewCalendar from "./Calendar";
 import CustomWeekView from "../utils/CustomWeekView";
 import ReactToPrint from "react-to-print";
 import "./styles/CalendarsToPrint.css"
+import {EventData} from "../models/Activity";
 
 function CalendarsToPrint({
-                             rangeStart,
-                             rangeEnd,
-                             cbxDeleteDatesChecked,
-                             cbxSelectDateChecked,
-                             roomNumber,
-                             roomActivities,
-                             backgroundEvent,
-                             handleSelectSlot,
-                             onAfterPrint
-                         }: {
+                              rangeStart,
+                              rangeEnd,
+                              cbxDeleteDatesChecked,
+                              cbxSelectDateChecked,
+                              roomNumber,
+                              roomActivities,
+                              backgroundEvent,
+                              handleSelectSlot,
+                              onAfterPrint
+                          }: {
     rangeStart: Date,
     rangeEnd: Date,
     cbxDeleteDatesChecked: boolean,
     cbxSelectDateChecked: boolean,
+    roomNumber?: number,
+    roomActivities: EventData[],
+    backgroundEvent: any,
+    handleSelectSlot: any,
+    onAfterPrint: () => void
 }) {
     const CalendarsToPrintForwardRef = React.forwardRef((props: any, ref) => {
         let startDate: Date = rangeStart;
@@ -124,8 +130,9 @@ function CalendarsToPrint({
                    .rbc-current-time-indicator { display: none !important; }\
                    .rbc-day-slot .rbc-background-event { display: none !important; }\
                    .rbc-timeslot-group { min-height: 30px; }\
-                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }"
-                    + (cbxDeleteDatesChecked ? ".rbc-toolbar { display: none !important; }}" : "") + "\ }"}
+                   .rbc-event, .rbc-event.rbc-selected, .rbc-day-slot .rbc-selected.rbc-background-event { color: black; background-color: white; }\
+                  }"
+                }
             </style>
             <div>
                 {calendars}
