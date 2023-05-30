@@ -5,6 +5,8 @@ WORKDIR backend
 
 COPY . ./backend
 
+WORKDIR backend
+
 RUN mvn clean install -Dmaven.test.skip=true
 
 EXPOSE 8080
