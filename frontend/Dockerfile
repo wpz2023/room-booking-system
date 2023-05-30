@@ -5,8 +5,6 @@ WORKDIR frontend
 
 COPY . .
 
-RUN npm install -g http-server
-
 RUN npm ci --ignore-scripts
 
 EXPOSE 5173
