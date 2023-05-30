@@ -1,0 +1,7 @@
+.rbc-time-view .rbc-allday-cell {
+    display: none;
+}
+
+.hide-navigation .rbc-btn-group {
+    display: none !important;
+}
