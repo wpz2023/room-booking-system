@@ -19,7 +19,7 @@ services:
     networks:
       - app_net
     volumes:
-      - ./admin.properties:/backend/admin.properties
+      - ./admin.properties:/admin.properties
 
 networks:
   app_net:

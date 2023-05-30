@@ -3,9 +3,7 @@ FROM maven:3.9.2-amazoncorretto-17-debian
 RUN mkdir backend
 WORKDIR backend
 
-COPY . ./backend
-
-WORKDIR backend
+COPY . .
 
 RUN mvn clean install -Dmaven.test.skip=true
 
