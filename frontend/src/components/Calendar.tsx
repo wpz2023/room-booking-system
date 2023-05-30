@@ -1,11 +1,11 @@
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import React, { useEffect, useRef } from "react";
-import { pl } from "date-fns/locale";
+import {Calendar, dateFnsLocalizer} from "react-big-calendar";
+import React, {useEffect, useRef} from "react";
+import {pl} from "date-fns/locale";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import { EventData } from "../models/Activity";
+import {EventData} from "../models/Activity";
 
 interface EventProps {
   event: EventData;
@@ -73,6 +73,8 @@ function NewCalendar({
   backgroundEvent,
   handleSelectSlot,
   selectable,
+  countOfDays,
+  formats
 }: {
   activities: EventData[];
   backgroundEvent: BackgroundEvent | undefined;
@@ -124,6 +126,8 @@ function NewCalendar({
       style={{ height: "full" }}
       min={minDate}
       max={maxDate}
+      formats={formats}
+      countOfDays={countOfDays ? countOfDays - 1 : null}
       messages={{
         allDay: "Cały dzień",
         previous: "Poprzedni",
