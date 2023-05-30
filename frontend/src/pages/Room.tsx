@@ -20,7 +20,7 @@ function Room() {
     const [cbxSelectDateChecked, setCbxSelectDateChecked] = React.useState(false);
     const [smallCalendarValues, setSmallCalendarValues] = useState([undefined, undefined]);
 
-    let token = window.sessionStorage.getItem("jwtToken");
+    let token = window.localStorage.getItem("jwtToken");
 
     useEffect(() => {
         refetchRoom();
@@ -28,7 +28,7 @@ function Room() {
     }, []);
 
     useEffect(() => {
-        token = window.sessionStorage.getItem("jwtToken");
+        token = window.localStorage.getItem("jwtToken");
         refetchRoom();
     }, [token]);
 

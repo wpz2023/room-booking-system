@@ -42,7 +42,7 @@ function Login() {
 
   useEffect(() => {
     if (tokenMutation.isSuccess) {
-      window.sessionStorage.setItem("jwtToken", tokenMutation.data?.token);
+      window.localStorage.setItem("jwtToken", tokenMutation.data?.token);
       setEmail("");
       setPassword("");
       const path = sessionStorage.getItem("page") as string;

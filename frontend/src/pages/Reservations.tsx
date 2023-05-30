@@ -5,7 +5,7 @@ import { ReservationData } from "../models/Reservation";
 import ReservationsTable from "../components/ReservationsTable";
 
 function Reservations() {
-  const token = sessionStorage.getItem("jwtToken");
+  const token = localStorage.getItem("jwtToken");
   const reservations = useQuery<ReservationData[]>({
     queryKey: ["reservations"],
     queryFn: () =>

@@ -20,7 +20,7 @@ function Reservation() {
   const [reservationStatus, setReservationStatus] = useState(true);
   const [popupVisible, setPopupVisible] = useState(false);
 
-  let token = window.sessionStorage.getItem("jwtToken");
+  let token = window.localStorage.getItem("jwtToken");
 
   useEffect(() => {
     reservationQuery.refetch();
@@ -43,7 +43,7 @@ function Reservation() {
   }, [reservation]);
 
   useEffect(() => {
-    token = window.sessionStorage.getItem("jwtToken");
+    token = window.localStorage.getItem("jwtToken");
     reservationQuery.refetch();
     if (reservationQuery.data != undefined) {
       reservationQuery.data.status = ReservationStatus.get(

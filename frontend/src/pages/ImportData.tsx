@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function ImportData() {
-  const token = window.sessionStorage.getItem("jwtToken");
+  const token = window.localStorage.getItem("jwtToken");
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
   const [clickedRoom, setRoom] = useState<RoomData>({

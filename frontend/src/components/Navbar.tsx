@@ -10,16 +10,16 @@ function Navbar() {
     enabled: false,
   });
 
-  let token = window.sessionStorage.getItem("jwtToken");
+  let token = window.localStorage.getItem("jwtToken");
 
   useEffect(() => {
-    token = window.sessionStorage.getItem("jwtToken");
+    token = window.localStorage.getItem("jwtToken");
   }, [token]);
 
   const logout = (event: React.MouseEvent) => {
     event.preventDefault();
     logoutQuery.refetch();
-    window.sessionStorage.removeItem("jwtToken");
+    window.localStorage.removeItem("jwtToken");
     navigate("/login", { replace: true });
   };
 
