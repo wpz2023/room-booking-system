@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { useParams } from "react-router-dom";
 import { ReservationData } from "../models/Reservation";
 import Api from "../Api";
@@ -9,9 +9,19 @@ import { ToastContainer, toast } from "react-toastify";
 import ModifyReservationModal from "../components/ModifyReservationModal";
 import { parseDateFromUTC } from "../utils/ParseDate";
 import NewCalendar from "../components/Calendar";
-import { Activity } from "../models/Activity";
+import {Activity, EventData} from "../models/Activity";
 import { mapActivitiesToEvents } from "../utils/MapActivitiesToEvents";
-import { Views } from "react-big-calendar";
+import {EventPropGetter, Views} from "react-big-calendar";
+
+const eventPropGetter: EventPropGetter<EventData> = (event: EventData) => {
+  let backgroundColor = '#3174ad'
+
+  if (event.is_usos == undefined) {
+    backgroundColor = '#0ea5e9'
+  }
+
+  return {style: {backgroundColor}}
+}
 
 function Reservation() {
   const { id } = useParams();
@@ -19,6 +29,7 @@ function Reservation() {
   const [reservation, setReservation] = useState<ReservationData>();
   const [reservationStatus, setReservationStatus] = useState(true);
   const [popupVisible, setPopupVisible] = useState(false);
+  const toastId = useRef(null);
 
   let token = window.localStorage.getItem("jwtToken");
 
@@ -110,6 +121,7 @@ function Reservation() {
       id: string;
       reservation: ReservationData;
     }) => {
+      toastId.current = toast.loading("Ładowanie...");
       const response = await Api.authApi.put(
         `reservation/manage/${id}`,
         {
@@ -136,12 +148,26 @@ function Reservation() {
     onSuccess: async () => {
       await reservationQuery.refetch();
       await room.refetch();
-      toast.success("Rezerwacja została zmodyfikowana!");
+      toast.update(toastId.current, {
+        render: "Rezerwacja została zmodyfikowana!",
+        type: "success",
+        autoClose: 2000,
+        isLoading: false,
+      });
+    },
+    onError: () => {
+      toast.update(toastId.current, {
+        render: "Nie można zmodyfikować rezerwacji, spotkanie koliduje z innym!",
+        type: "error",
+        autoClose: 2000,
+        isLoading: false,
+      });
     },
   });
 
   const declineReservation = useMutation({
     mutationFn: async (id: string) => {
+      toastId.current = toast.loading("Ładowanie...");
       const response = await Api.authApi.post(
         `reservation/manage/${id}/decline`,
         {},
@@ -155,12 +181,18 @@ function Reservation() {
     },
     onSuccess: async (data) => {
       await reservationQuery.refetch();
-      toast.success("Rezerwacja została odrzucona");
+      toast.update(toastId.current, {
+        render: "Rezerwacja została odrzucona!",
+        type: "success",
+        autoClose: 2000,
+        isLoading: false,
+      });
     },
   });
 
   const acceptReservation = useMutation({
     mutationFn: async (id: string) => {
+      toastId.current = toast.loading("Ładowanie...");
       const response = await Api.authApi.post(
         `reservation/manage/${id}/accept`,
         {},
@@ -174,7 +206,20 @@ function Reservation() {
     },
     onSuccess: async (data) => {
       await reservationQuery.refetch();
-      toast.success("Rezerwacja została potwierdzona!");
+      toast.update(toastId.current, {
+        render: "Rezerwacja została potwierdzona!",
+        type: "success",
+        autoClose: 2000,
+        isLoading: false,
+      });
+    },
+    onError: () => {
+      toast.update(toastId.current, {
+        render: "Nie można potwierdzić rezerwacji, spotkanie koliduje z innym!",
+        type: "error",
+        autoClose: 2000,
+        isLoading: false,
+      });
     },
   });
 
@@ -297,6 +342,7 @@ function Reservation() {
                   toolbar={true}
                   step={15}
                   selectable={false}
+                  eventPropGetter={eventPropGetter}
                 />
               </div>
             </div>
