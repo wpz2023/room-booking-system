@@ -115,6 +115,24 @@ function ImportData() {
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
       <ToastContainer />
+
+      {true && (
+        <div role="alert" className="w-1/3 pb-14 text-center">
+          <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2 text-xl">
+            Nierozwiązane konflikty
+          </div>
+          <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+            <p className="text-xl">W systemie znajdują się nierozwiązane konflikty.</p>
+            <button
+              // onClick={}
+              className="w-2/5 px-4 py-3 mt-3 mb-1 transition hover:scale-110 delay-150 rounded-lg
+              bg-red-500 hover:bg-red-700 text-white">
+              Rozwiąż konflikty
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="w-2/5 pb-14 text-center text-2xl font-medium">
         <p>Import danych</p>
       </div>
