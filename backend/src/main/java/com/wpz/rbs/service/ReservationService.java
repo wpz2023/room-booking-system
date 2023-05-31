@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Service
 public class ReservationService {
@@ -79,7 +80,7 @@ public class ReservationService {
         Reservation reservation = reservationOptional.get();
         if (reservation.getStatus() != ReservationStatus.OPEN)
             return ResponseEntity.status(409).body("Reservation has already been resolved. It is " + reservation.getStatus().toString());
-        
+
         int activityId = declineReservationNoChecks(reservation);
         emailService.sendDeclinedMessageToUser(reservation);
 
@@ -136,10 +137,8 @@ public class ReservationService {
 
     @Transactional(rollbackOn = {Exception.class})
     public int declineReservationNoChecks(Reservation reservation) {
-        
         reservation.setStatus(ReservationStatus.DECLINED);
         reservationRepository.save(reservation);
-
         return reservation.getId();
     }
 
@@ -159,14 +158,39 @@ public class ReservationService {
     }
 
     private boolean collisionExists(int roomId, Date newStartDate, Date newEndDate) {
-        return activityRepository.findAllByRoomId(roomId).stream().anyMatch(a -> {
+        return activityRepository.findAllByRoomId(roomId).stream().anyMatch(checked(a -> {
+            Date startDate = StaticHelpers.parseDateTime(a.getStart_time());
+            Date endDate = StaticHelpers.parseDateTime(a.getEnd_time());
+            return StaticHelpers.activitiesOverlapping(newStartDate, newEndDate, startDate, endDate);
+        }));
+    }
+
+    private <T> Predicate<T> checked(CheckedPredicate<T> predicate) {
+        return t -> {
             try {
-                Date startDate = StaticHelpers.parseDateTime(a.getStart_time());
-                Date endDate = StaticHelpers.parseDateTime(a.getEnd_time());
-                return StaticHelpers.activitiesOverlapping(newStartDate, newEndDate, startDate, endDate);
+                return predicate.test(t);
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                throw new UncheckedParseException(e);
             }
-        });
+        };
+    }
+
+    @FunctionalInterface
+    private interface CheckedPredicate<T> {
+        boolean test(T t) throws ParseException;
+    }
+
+    private static class UncheckedParseException extends RuntimeException {
+        private final ParseException cause;
+
+        public UncheckedParseException(ParseException cause) {
+            super(cause);
+            this.cause = cause;
+        }
+
+        @Override
+        public synchronized ParseException getCause() {
+            return cause;
+        }
     }
 }

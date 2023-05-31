@@ -20,18 +20,22 @@ public class RoomController {
 
     @GetMapping("/room")
     private ResponseEntity<List<Room>> getAllFiltered(String number, String type, Integer capacityMin, String annotation, String startTime, String endTime) {
-
-        if((startTime == null && endTime != null) || (startTime != null && endTime == null)){
-            return ResponseEntity.status(400).body(null);
+        if ((startTime == null && endTime != null) || (startTime != null && endTime == null)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        var rooms = roomService.getAllFiltered(number, type, capacityMin, annotation, startTime, endTime);
+        List<Room> rooms = roomService.getAllFiltered(number, type, capacityMin, annotation, startTime, endTime);
         return ResponseEntity.ok(rooms);
     }
 
     @GetMapping("/room/{id}")
-    private Room get(@PathVariable("id") int id) {
-        return roomService.getById(id);
+    private ResponseEntity<Room> get(@PathVariable("id") int id) {
+        Room room = roomService.getById(id);
+        if (room != null) {
+            return ResponseEntity.ok(room);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PatchMapping("/room/update/{id}")

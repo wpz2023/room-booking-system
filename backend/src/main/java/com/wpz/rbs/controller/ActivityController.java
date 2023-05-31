@@ -1,9 +1,9 @@
 package com.wpz.rbs.controller;
 
 import com.wpz.rbs.model.Activity;
-import com.wpz.rbs.model.ActivityConflict;
 import com.wpz.rbs.service.ActivityService;
 import jakarta.validation.constraints.NotEmpty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -30,17 +30,38 @@ public class ActivityController {
     }
 
     @GetMapping("room/{id}/week")
-    private List<Activity> getByRoomIdForNextWeek(@PathVariable("id") int roomId, @NotEmpty String startTime) throws ParseException {
-        return activityService.getByRoomIdForNextWeek(roomId, startTime);
+    private ResponseEntity<?> getByRoomIdForNextWeek(@PathVariable("id") int roomId, @NotEmpty String startTime) {
+        try {
+            return ResponseEntity.ok(activityService.getByRoomIdForNextWeek(roomId, startTime));
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("conflicts")
+    private ResponseEntity<?> getConflictsFromAllRooms(@RequestBody List<String> request) {
+        try {
+            return ResponseEntity.ok(activityService.resolveConflictsAllRoom(request));
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @GetMapping("room/{id}/conflicts")
-    private ActivityConflict getConflictsByRoomId(@PathVariable("id") int roomId) throws ParseException {
-        return activityService.getConflictsRoom(roomId);
+    private ResponseEntity<?> getConflictsByRoomId(@PathVariable("id") int roomId) {
+        try {
+            return ResponseEntity.ok(activityService.getConflictsRoom(roomId));
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @PostMapping("room/{id}/conflicts")
-    private ActivityConflict getConflictsByRoomId(@PathVariable("id") int roomId, @RequestBody List<String> request) throws ParseException {
-        return activityService.resolveConflictsRoom(roomId, request);
+    private ResponseEntity<?> getConflictsByRoomId(@PathVariable("id") int roomId, @RequestBody List<String> request) {
+        try {
+            return ResponseEntity.ok(activityService.resolveConflictsRoom(roomId, request));
+        } catch (ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 }

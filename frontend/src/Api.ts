@@ -24,7 +24,7 @@ const AxiosInterceptorsSetup = (navigate: NavigateFunction) => {
         (response) => response,
         (error) => {
           if (error.response.status === 500) {
-            window.sessionStorage.removeItem("jwtToken");
+            window.localStorage.removeItem("jwtToken");
             navigate("/login");
           }
         }

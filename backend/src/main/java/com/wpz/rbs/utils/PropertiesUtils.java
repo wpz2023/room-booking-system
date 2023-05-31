@@ -23,7 +23,8 @@ public class PropertiesUtils {
         try {
             properties.load(new FileInputStream(adminPropertiesPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("admin.properties can't be load" + e.getMessage());
+            System.exit(1);
         }
 
         return properties;

@@ -1,9 +1,8 @@
 package com.wpz.rbs.controller.importers;
 
-import com.wpz.rbs.model.Activity;
 import com.wpz.rbs.service.importers.ActivityImportService;
 import com.wpz.rbs.utils.StaticHelpers;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping("/import/activity")
@@ -24,14 +22,22 @@ public class ActivityImportController {
     }
 
     @GetMapping("/{id}")
-    public List<Activity> importRoomActivitiesToday(@PathVariable("id") int roomId) throws IOException, ParseException {
-        var today = new Date();
-        return activityImportService.importRoomActivitiesYear(roomId, today);
+    public ResponseEntity<?> importRoomActivitiesToday(@PathVariable("id") int roomId) {
+        try {
+            Date today = new Date();
+            return ResponseEntity.ok(activityImportService.importRoomActivitiesYear(roomId, today));
+        } catch (IOException | ParseException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/{date}")
-    public List<Activity> importRoomActivitiesDate(@PathVariable("id") int roomId, @PathVariable("date") String dateStr) throws IOException, ParseException {
-        var date = StaticHelpers.parseDate(dateStr);
-        return activityImportService.importRoomActivitiesYear(roomId, date);
+    public ResponseEntity<?> importRoomActivitiesDate(@PathVariable("id") int roomId, @PathVariable("date") String dateStr) {
+        try {
+            Date date = StaticHelpers.parseDate(dateStr);
+            return ResponseEntity.ok(activityImportService.importRoomActivitiesYear(roomId, date));
+        } catch (ParseException | IOException e) {
+            return ResponseEntity.status(503).body(e.getMessage());
+        }
     }
 }

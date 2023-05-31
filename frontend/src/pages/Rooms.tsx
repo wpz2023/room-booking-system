@@ -9,7 +9,7 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 function Rooms() {
-  const token = sessionStorage.getItem("jwtToken");
+  const token = localStorage.getItem("jwtToken");
 
   const [filterDate, setFilterDate] = useState(false);
   const [startDate, setStartDate] = useState<Value>(new Date());
