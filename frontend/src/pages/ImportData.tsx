@@ -10,7 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 function ImportData() {
   const token = window.localStorage.getItem("jwtToken");
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
+  const [unresolvedPopupVisible, setUnresolvedPopupVisible] = useState<boolean>(false);
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
+  const [unresolvedConflictsToDelete, setUnresolvedConflictsToDelete] = useState<string[]>([]);
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [loopIndex, setLoopIndex] = useState<number>(-1);
   const [isImportLoop, setIsImportLoop] = useState(false);
@@ -74,6 +76,36 @@ function ImportData() {
     }
   );
 
+  // useEffect(() => {
+  //   if (unresolvedConflictsToDelete.length > 0) {
+  //     unresolvedMutate();
+  //   }
+  // }, [unresolvedConflictsToDelete]);
+
+  const { mutate: unresolvedMutate} = useMutation<Conflict, string[]>(
+      async (unresolvedConflictsToDelete: string[]) => {
+        const response = await Api.authApi.post(
+            `activity/conflicts`,
+            unresolvedConflictsToDelete,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+        );
+        setUnresolvedConflictsToDelete([]);
+        unresolvedConflicts = response.data;
+        return response.data;
+      },
+      {
+        onSuccess: (responseData) => {
+          if (responseData) {
+            setUnresolvedPopupVisible(true);
+          }
+        },
+      }
+  );
+
   const getRoomActivities = async () => {
     if (selectedRoom.id != 0) {
       return await Api.authApi
@@ -113,7 +145,7 @@ function ImportData() {
       });
   };
 
-  let { isFetching, data, refetch } = useQuery<RoomData[]>(
+  const { isFetching, data, refetch } = useQuery<RoomData[]>(
     ["data"],
     getImportRooms,
     {
@@ -136,7 +168,27 @@ function ImportData() {
 
   useEffect(() => {
     roomsQuery.refetch();
+    refetchUnresolvedConflicts();
   }, [token]);
+
+  const getUnresolvedConflicts = () => {
+    return Api.authApi
+        .post("activity/conflicts", unresolvedConflictsToDelete, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => res.data);
+  };
+
+  let { refetch: refetchUnresolvedConflicts, data: unresolvedConflicts } = useQuery<Conflict>(
+      ["unresolvedConflicts"],
+      getUnresolvedConflicts,
+      {
+        refetchOnWindowFocus: false,
+        enabled: false
+      }
+  );
 
   const handleClick = () => {
     refetch();
@@ -155,17 +207,28 @@ function ImportData() {
     setActivitiesToDelete(activities);
   };
 
+  const deleteUnresolvedActivities = (activities: string[]) => {
+    unresolvedMutate(activities);
+  };
+
   const importAllRoomsActivities = (e) => {
     e.preventDefault();
     setIsImportLoop(true)
     setLoopIndex(0)
   }
 
+  const handleResolvingConflicts = (e) => {
+    e.preventDefault();
+    setUnresolvedPopupVisible(true);
+  };
+
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
       <ToastContainer />
 
-      {true && (
+        <p>{unresolvedConflicts?.toString()}</p>
+
+      {unresolvedConflicts && (
         <div role="alert" className="w-1/3 pb-14 text-center">
           <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2 text-xl">
             Nierozwiązane konflikty
@@ -173,7 +236,7 @@ function ImportData() {
           <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
             <p className="text-xl">W systemie znajdują się nierozwiązane konflikty.</p>
             <button
-              // onClick={}
+              onClick={handleResolvingConflicts}
               disabled={isActivitiesFetching}
               style={{
                 cursor: isActivitiesFetching ? "wait" : "pointer",
@@ -265,6 +328,14 @@ function ImportData() {
               deleteActivities={deleteActivities}
               roomName={selectedRoom.number}
             />
+          )}
+          {unresolvedPopupVisible && (
+              <ConflictPopUp
+                  conflict={unresolvedConflicts}
+                  onClose={() => setUnresolvedPopupVisible(false)}
+                  deleteActivities={deleteUnresolvedActivities}
+                  roomName={rooms.find((room) => room.id === unresolvedConflicts?.userActivity.room_id)?.number}
+              />
           )}
         </div>
       )}
