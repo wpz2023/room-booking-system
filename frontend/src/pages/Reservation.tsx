@@ -155,7 +155,8 @@ function Reservation() {
         isLoading: false,
       });
     },
-    onError: () => {
+    onError: async () => {
+      await reservationQuery.refetch();
       toast.update(toastId.current, {
         render: "Nie można zmodyfikować rezerwacji, spotkanie koliduje z innym!",
         type: "error",
