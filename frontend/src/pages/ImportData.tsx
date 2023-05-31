@@ -11,6 +11,7 @@ function ImportData() {
   const token = window.localStorage.getItem("jwtToken");
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<RoomData[]>([]);
   const [clickedRoom, setRoom] = useState<RoomData>({
     capacity: 0,
     roomAnnotation: undefined,
@@ -83,10 +84,13 @@ function ImportData() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => res.data);
+      .then((res) => {
+        setRooms(res.data)
+        return res.data
+      });
   };
 
-  const { isFetching, data, refetch } = useQuery<RoomData[]>(
+  let { isFetching, data, refetch } = useQuery<RoomData[]>(
     ["data"],
     getImportRooms,
     {
@@ -94,6 +98,22 @@ function ImportData() {
       enabled: false,
     }
   );
+
+  const roomsQuery = useQuery<RoomData[]>({
+    queryKey: ["rooms"],
+    queryFn: () => {
+      return Api.Api.get("room")
+          .then((res) => {
+            setRooms(res.data)
+            return res.data
+          })
+    },
+    enabled: true,
+  });
+
+  useEffect(() => {
+    roomsQuery.refetch();
+  }, [token]);
 
   const handleClick = () => {
     refetch();
@@ -141,20 +161,20 @@ function ImportData() {
         bg-sky-500 hover:bg-sky-700 hover:shadow-sky-700 text-white shadow-lg shadow-sky-500"
         onClick={handleClick}
       >
-        Importuj dane
+        Importuj sale
       </button>
       {isFetching ? (
         <p>Ładowanie danych</p>
       ) : (
         <div>
-          {data && (
+          {rooms.length > 0 && (
             <div className="w-[450px] px-6">
               <p className="font-medium">Numer sali</p>
               <hr className="h-px my-3 bg-gray-200 border-0 h-0.5 dark:bg-gray-700" />
             </div>
           )}
           <ul role="list" className="w-full p-6 divide-y divide-slate-200">
-            {data?.map((room) => (
+            {rooms.map((room) => (
               <li className="first:pt-0 last:pb-0 py-8" key={room.id}>
                 <div className="flex text-center items-center">
                   <p className="basis-3/5 font-medium">{room.number}</p>
