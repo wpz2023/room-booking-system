@@ -6,13 +6,14 @@ import ConflictPopUp from "../components/ConflictPopUp";
 import { Conflict } from "../models/Conflict";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {Activity} from "../models/Activity";
 
 function ImportData() {
   const token = window.localStorage.getItem("jwtToken");
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [unresolvedPopupVisible, setUnresolvedPopupVisible] = useState<boolean>(false);
   const [activitiesToDelete, setActivitiesToDelete] = useState<string[]>([]);
-  const [unresolvedConflictsToDelete, setUnresolvedConflictsToDelete] = useState<string[]>([]);
+  const [unresolvedConflicts, setUnresolvedConflicts] = useState<Conflict>();
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [loopIndex, setLoopIndex] = useState<number>(-1);
   const [isImportLoop, setIsImportLoop] = useState(false);
@@ -76,12 +77,6 @@ function ImportData() {
     }
   );
 
-  // useEffect(() => {
-  //   if (unresolvedConflictsToDelete.length > 0) {
-  //     unresolvedMutate();
-  //   }
-  // }, [unresolvedConflictsToDelete]);
-
   const { mutate: unresolvedMutate} = useMutation<Conflict, string[]>(
       async (unresolvedConflictsToDelete: string[]) => {
         const response = await Api.authApi.post(
@@ -93,8 +88,7 @@ function ImportData() {
               },
             }
         );
-        setUnresolvedConflictsToDelete([]);
-        unresolvedConflicts = response.data;
+        setUnresolvedConflicts(response.data);
         return response.data;
       },
       {
@@ -168,27 +162,18 @@ function ImportData() {
 
   useEffect(() => {
     roomsQuery.refetch();
-    refetchUnresolvedConflicts();
+    getUnresolvedConflicts();
   }, [token]);
 
   const getUnresolvedConflicts = () => {
     return Api.authApi
-        .post("activity/conflicts", unresolvedConflictsToDelete, {
+        .post("activity/conflicts", [], {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
-        .then((res) => res.data);
+        .then((res) => setUnresolvedConflicts(res.data));
   };
-
-  let { refetch: refetchUnresolvedConflicts, data: unresolvedConflicts } = useQuery<Conflict>(
-      ["unresolvedConflicts"],
-      getUnresolvedConflicts,
-      {
-        refetchOnWindowFocus: false,
-        enabled: false
-      }
-  );
 
   const handleClick = () => {
     refetch();
@@ -225,9 +210,6 @@ function ImportData() {
   return (
     <div className="flex flex-col items-center pt-20 pb-6">
       <ToastContainer />
-
-        <p>{unresolvedConflicts?.toString()}</p>
-
       {unresolvedConflicts && (
         <div role="alert" className="w-1/3 pb-14 text-center">
           <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2 text-xl">
